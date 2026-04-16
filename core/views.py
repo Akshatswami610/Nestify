@@ -7,7 +7,7 @@ def signup(request):
     return render(request, 'signup.html')
 
 def logout(request):
-    return render(request, 'logout.html')
+    return render(request, 'login.html')
 
 def ownerdashboard(request):
     return render(request, 'owner-dashboard.html')
