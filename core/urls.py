@@ -12,9 +12,12 @@ urlpatterns = [
     path('login', login, name='login'),
     path('signup', signup, name='signup'),
     path('logout', logout, name='logout'),
+    path('dashboard', dashboard, name='dashboard'),
     path('', home, name='home'),
     path('home', home, name='home'),
     path('pg', pg, name='pg'),
+    path('about', about, name='about'),
+    path('contact', contact, name='contact'),
 ]
 
 
