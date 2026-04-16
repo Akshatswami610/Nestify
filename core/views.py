@@ -9,8 +9,8 @@ def signup(request):
 def logout(request):
     return render(request, 'logout.html')
 
-def dashboard(request):
-    return render(request, 'dashboard.html')
+def ownerdashboard(request):
+    return render(request, 'owner-dashboard.html')
 
 def home(request):
     return render(request, 'home.html')
