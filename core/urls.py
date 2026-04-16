@@ -9,15 +9,15 @@ import dashboard
 urlpatterns = [
     path('admin/', admin.site.urls),
     #path('core/v1/', include('api.urls')),
-    path('login', login, name='login'),
-    path('signup', signup, name='signup'),
-    path('logout', logout, name='logout'),
-    path('owner-dashboard', ownerdashboard, name='owner-dashboard'),
+    path('login/', login, name='login'),
+    path('signup/', signup, name='signup'),
+    path('logout/', logout, name='logout'),
+    path('owner-dashboard/', ownerdashboard, name='owner-dashboard'),
     path('', home, name='home'),
-    path('home', home, name='home'),
-    path('pg', pg, name='pg'),
-    path('about', about, name='about'),
-    path('contact', contact, name='contact'),
+    path('home/', home, name='home'),
+    path('pg/', pg, name='pg'),
+    path('about/', about, name='about'),
+    path('contact/', contact, name='contact'),
 ]
 
 # Serve static and media files during development
