@@ -2,11 +2,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate, get_user_model
 
-from .serializers import RegisterSerializer, UserSerializer
-
-User = get_user_model()
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 
 
 # -----------------------------
@@ -24,39 +21,31 @@ class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        identifier = request.data.get("email") or request.data.get("phone")
-        password = request.data.get("password")
+        serializer = LoginSerializer(data={
+            "identifier": request.data.get("email")
+                          or request.data.get("phone_number")
+                          or request.data.get("username"),
+            "password": request.data.get("password")
+        })
 
-        # Validate input
-        if not identifier or not password:
-            return Response(
-                {"error": "Email/Phone and password are required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
 
-        # Authenticate using custom backend (email OR phone)
-        user = authenticate(request, username=identifier, password=password)
-
-        if not user:
-            return Response(
-                {"error": "Invalid credentials"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        # Check if user is active
-        if not user.is_active:
-            return Response(
-                {"error": "Account is disabled"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        # Generate or get token
         token, _ = Token.objects.get_or_create(user=user)
 
-        return Response(
-            {
-                "token": token.key,
-                "user": UserSerializer(user).data,
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response({
+            "token": token.key,
+            "user": UserSerializer(user).data,
+            "message": "Login successful"
+        }, status=status.HTTP_200_OK)
+
+
+# -----------------------------
+# LOGOUT VIEW (API)
+# -----------------------------
+class LogoutAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response({"message": "Logged out successfully"})
