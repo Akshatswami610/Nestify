@@ -1,14 +1,328 @@
 {% extends 'base.html' %}
+{% block title %}Sign Up – Nestify{% endblock %}
+
+{% block extra_head %}
+<style>
+  .auth-page { min-height: calc(100vh - 64px); display: grid; grid-template-columns: 1fr 1fr; }
+
+  /* LEFT */
+  .panel-left { position:relative; background:#1a1a2e; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; padding:48px; }
+  .panel-left::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 70% 60% at 70% 20%, #a78bfa55 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 20% 70%, #ff5a5f44 0%, transparent 55%), radial-gradient(ellipse 80% 80% at 50% 50%, #1e2040 0%, #1a1a2e 100%); z-index:0; }
+  .blob { position:absolute; border-radius:50%; filter:blur(60px); opacity:.35; z-index:0; animation:float 8s ease-in-out infinite alternate; }
+  .blob-1 { width:300px; height:300px; background:#7c3aed; top:-60px; right:-60px; animation-delay:0s; }
+  .blob-2 { width:260px; height:260px; background:#FF5A5F; bottom:60px; left:-60px; animation-delay:-3s; }
+  .blob-3 { width:180px; height:180px; background:#ff9a6c; top:40%; left:40%; animation-delay:-5s; }
+  @keyframes float { from{transform:translate(0,0) scale(1);} to{transform:translate(20px,30px) scale(1.08);} }
+
+  .illustration { position:relative; z-index:1; margin-bottom:40px; align-self:center; }
+  .panel-copy { position:relative; z-index:1; }
+  .panel-copy h1 { font-family:'Fraunces',serif; font-weight:300; font-size:2.2rem; line-height:1.2; color:#fff; margin-bottom:12px; }
+  .panel-copy h1 em { font-style:italic; color:#c4b5fd; }
+  .panel-copy p { font-size:.93rem; color:rgba(255,255,255,.55); max-width:320px; line-height:1.6; }
+  .perks { display:flex; flex-direction:column; gap:12px; margin-top:28px; }
+  .perk { display:flex; align-items:center; gap:12px; color:rgba(255,255,255,.8); font-size:.875rem; }
+  .perk-icon { width:32px; height:32px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+
+  /* RIGHT */
+  .panel-right { display:flex; align-items:center; justify-content:center; padding:40px 24px; background:#f9f7f5; overflow-y:auto; }
+  .card { background:#fff; border-radius:24px; box-shadow:0 8px 40px rgba(0,0,0,.10); padding:44px 44px; width:100%; max-width:440px; animation:slideUp .5s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
+
+  .card-title { font-family:'Fraunces',serif; font-size:1.7rem; font-weight:400; color:#1a1a2e; margin-bottom:4px; }
+  .card-sub { font-size:.875rem; color:#6b7280; margin-bottom:28px; }
+
+  /* role toggle */
+  .role-toggle { display:grid; grid-template-columns:1fr 1fr; background:#f3f4f6; border-radius:12px; padding:4px; gap:4px; margin-bottom:24px; }
+  .role-btn { border:none; background:none; padding:10px; border-radius:9px; font-size:.85rem; font-weight:600; font-family:'DM Sans',sans-serif; color:#6b7280; cursor:pointer; transition:all .2s; }
+  .role-btn.active { background:#fff; color:#1a1a2e; box-shadow:0 2px 8px rgba(0,0,0,.08); }
+
+  /* two-col */
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .field { margin-bottom:14px; }
+  .field label { display:block; font-size:.75rem; font-weight:600; color:#1a1a2e; margin-bottom:5px; letter-spacing:.03em; text-transform:uppercase; }
+  .input-wrap { position:relative; }
+  .input-wrap .ico { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:#b0b7c3; display:flex; align-items:center; pointer-events:none; }
+  .input-wrap input, .input-wrap select { width:100%; padding:12px 13px 12px 40px; border:1.5px solid #e5e7eb; border-radius:12px; font-size:.93rem; font-family:'DM Sans',sans-serif; color:#1a1a2e; background:#fafafa; outline:none; transition:border-color .2s,box-shadow .2s,background .2s; appearance:none; }
+  .input-wrap input::placeholder { color:#b0b7c3; }
+  .input-wrap input:focus, .input-wrap select:focus { border-color:#FF5A5F; background:#fff; box-shadow:0 0 0 3px rgba(255,90,95,.1); }
+  .pwd-toggle { position:absolute; right:13px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#b0b7c3; display:flex; align-items:center; transition:color .2s; }
+  .pwd-toggle:hover { color:#FF5A5F; }
+
+  /* password strength */
+  .strength-bar { display:flex; gap:4px; margin-top:6px; }
+  .strength-seg { flex:1; height:3px; border-radius:2px; background:#e5e7eb; transition:background .3s; }
+  .strength-label { font-size:.72rem; color:#6b7280; margin-top:4px; }
+
+  /* terms */
+  .terms { display:flex; align-items:flex-start; gap:10px; margin:16px 0; }
+  .terms input[type=checkbox] { accent-color:#FF5A5F; width:15px; height:15px; margin-top:2px; flex-shrink:0; cursor:pointer; }
+  .terms label { font-size:.82rem; color:#6b7280; line-height:1.5; }
+  .terms label a { color:#FF5A5F; text-decoration:none; font-weight:500; }
+
+  .error-msg { display:none; background:#fff1f1; border:1px solid #ffc5c5; color:#c0392b; border-radius:10px; padding:11px 14px; font-size:.83rem; margin-bottom:14px; }
+  .error-msg.show { display:flex; align-items:center; gap:8px; animation:shake .35s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+  .success-msg { display:none; background:#f0fdf4; border:1px solid #86efac; color:#166534; border-radius:10px; padding:11px 14px; font-size:.83rem; margin-bottom:14px; }
+  .success-msg.show { display:flex; align-items:center; gap:8px; }
+
+  .btn-primary { width:100%; padding:14px; background:#FF5A5F; color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .2s,transform .15s,box-shadow .2s; box-shadow:0 4px 16px rgba(255,90,95,.3); }
+  .btn-primary:hover:not(:disabled) { background:#e04a4f; transform:translateY(-1px); box-shadow:0 8px 24px rgba(255,90,95,.35); }
+  .btn-primary:disabled { opacity:.7; cursor:not-allowed; }
+  .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:none; }
+  .btn-primary.loading .spinner { display:block; }
+  .btn-primary.loading .btn-text { display:none; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+
+  .auth-link { text-align:center; margin-top:18px; font-size:.875rem; color:#6b7280; }
+  .auth-link a { color:#FF5A5F; font-weight:600; text-decoration:none; }
+  .auth-link a:hover { opacity:.8; }
+
+  @media (max-width:768px) {
+    .auth-page { grid-template-columns:1fr; }
+    .panel-left { display:none; }
+    .panel-right { padding:24px 16px; min-height:calc(100vh - 64px); }
+    .card { padding:32px 20px; }
+    .field-row { grid-template-columns:1fr; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2>Sign Up</h2>
+<div class="auth-page">
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" placeholder="Username"><br><br>
-    <input type="email" placeholder="Email"><br><br>
-    <input type="password" placeholder="Password"><br><br>
-    <button type="submit">Register</button>
-</form>
+  <!-- LEFT PANEL -->
+  <div class="panel-left">
+    <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+    <div class="illustration">
+      <svg width="280" height="220" viewBox="0 0 280 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- House shape -->
+        <path d="M140 30 L240 100 L220 100 L220 190 L60 190 L60 100 L40 100 Z" fill="#221833" opacity=".95"/>
+        <!-- Roof highlight -->
+        <path d="M140 30 L240 100 L220 100 L140 50 L60 100 L40 100 Z" fill="#2d1b3d" opacity=".9"/>
+        <!-- Door -->
+        <rect x="112" y="140" width="36" height="50" rx="4" fill="#FF5A5F" opacity=".7"/>
+        <circle cx="144" cy="166" r="3" fill="rgba(255,255,255,.6)"/>
+        <!-- Windows -->
+        <rect x="72" y="115" width="36" height="30" rx="4" fill="rgba(255,203,119,.25)" stroke="rgba(255,203,119,.4)" stroke-width="1.5"/>
+        <line x1="90" y1="115" x2="90" y2="145" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
+        <line x1="72" y1="130" x2="108" y2="130" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
+        <rect x="172" y="115" width="36" height="30" rx="4" fill="rgba(255,203,119,.35)" stroke="rgba(255,203,119,.4)" stroke-width="1.5"/>
+        <line x1="190" y1="115" x2="190" y2="145" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
+        <line x1="172" y1="130" x2="208" y2="130" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
+        <!-- Chimney -->
+        <rect x="185" y="45" width="16" height="30" rx="2" fill="#2a2040"/>
+        <!-- Smoke -->
+        <circle cx="193" cy="38" r="5" fill="rgba(255,255,255,.06)"/>
+        <circle cx="197" cy="28" r="7" fill="rgba(255,255,255,.05)"/>
+        <circle cx="190" cy="18" r="9" fill="rgba(255,255,255,.04)"/>
+        <!-- Garden path -->
+        <ellipse cx="140" cy="195" rx="50" ry="8" fill="rgba(255,90,95,.12)"/>
+        <rect x="132" y="190" width="16" height="10" rx="2" fill="rgba(255,90,95,.2)"/>
+        <!-- Stars -->
+        <circle cx="30" cy="25" r="1.5" fill="#fff" opacity=".5"/>
+        <circle cx="80" cy="15" r="1" fill="#fff" opacity=".4"/>
+        <circle cx="200" cy="20" r="1.5" fill="#fff" opacity=".6"/>
+        <circle cx="255" cy="40" r="1" fill="#fff" opacity=".5"/>
+        <!-- Key icon top-right -->
+        <circle cx="240" cy="170" r="22" fill="rgba(255,90,95,.15)" stroke="rgba(255,90,95,.3)" stroke-width="1"/>
+        <path d="M233 170a7 7 0 1 1 7 7 7 7 0 0 1-7-7zm12 0h10m-3-3v6" stroke="#FF9A8B" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="panel-copy">
+      <h1>List or <em>find</em> your<br>ideal PG today.</h1>
+      <p>Join thousands of tenants and owners already using Nestify across India.</p>
+      <div class="perks">
+        <div class="perk"><div class="perk-icon">🔍</div> Smart search across 30+ cities</div>
+        <div class="perk"><div class="perk-icon">🛡️</div> Verified listings only</div>
+        <div class="perk"><div class="perk-icon">💬</div> Direct owner chat — zero brokerage</div>
+        <div class="perk"><div class="perk-icon">⚡</div> Get responses within minutes</div>
+      </div>
+    </div>
+  </div>
 
+  <!-- RIGHT PANEL -->
+  <div class="panel-right">
+    <div class="card">
+      <h2 class="card-title">Create account</h2>
+      <p class="card-sub">Join Nestify — it's free.</p>
+
+      <!-- Role toggle -->
+      <div class="role-toggle" id="roleToggle">
+        <button type="button" class="role-btn active" data-role="tenant">🏠 I'm a Tenant</button>
+        <button type="button" class="role-btn" data-role="owner">🏢 I'm an Owner</button>
+      </div>
+
+      <div class="error-msg" id="errorMsg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <span id="errorText">Something went wrong.</span>
+      </div>
+      <div class="success-msg" id="successMsg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <span>Account created! Redirecting…</span>
+      </div>
+
+      <form id="signupForm" novalidate>
+        {% csrf_token %}
+        <input type="hidden" id="roleInput" name="role" value="tenant"/>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="firstName">First Name</label>
+            <div class="input-wrap">
+              <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+              <input type="text" id="firstName" name="first_name" placeholder="Aarav" required/>
+            </div>
+          </div>
+          <div class="field">
+            <label for="lastName">Last Name</label>
+            <div class="input-wrap">
+              <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+              <input type="text" id="lastName" name="last_name" placeholder="Sharma" required/>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email Address</label>
+          <div class="input-wrap">
+            <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <input type="email" id="email" name="email" placeholder="aarav@example.com" autocomplete="email" required/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="phone">Phone Number</label>
+          <div class="input-wrap">
+            <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+            <input type="tel" id="phone" name="phone" placeholder="9876543210" autocomplete="tel" required/>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="signupPassword">Password</label>
+          <div class="input-wrap">
+            <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <input type="password" id="signupPassword" name="password" placeholder="Min. 8 characters" autocomplete="new-password" required/>
+            <button type="button" class="pwd-toggle" id="pwdToggle">
+              <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </button>
+          </div>
+          <div class="strength-bar" id="strengthBar">
+            <div class="strength-seg" id="s1"></div>
+            <div class="strength-seg" id="s2"></div>
+            <div class="strength-seg" id="s3"></div>
+            <div class="strength-seg" id="s4"></div>
+          </div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+
+        <div class="terms">
+          <input type="checkbox" id="terms" required/>
+          <label for="terms">I agree to Nestify's <a href="/terms/">Terms of Service</a> and <a href="/privacy/">Privacy Policy</a></label>
+        </div>
+
+        <button type="submit" class="btn-primary" id="signupBtn">
+          <div class="spinner"></div>
+          <span class="btn-text">Create My Account</span>
+        </button>
+      </form>
+
+      <p class="auth-link">Already have an account? <a href="/login/">Log in</a></p>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Role toggle
+  let selectedRole = 'tenant';
+  document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedRole = btn.dataset.role;
+      document.getElementById('roleInput').value = selectedRole;
+    });
+  });
+
+  // Password toggle
+  const pwdInput  = document.getElementById('signupPassword');
+  const pwdToggle = document.getElementById('pwdToggle');
+  const eyeIcon   = document.getElementById('eyeIcon');
+  const EYE_OPEN  = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>`;
+  const EYE_SHUT  = `<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27z"/>`;
+  pwdToggle.addEventListener('click', () => {
+    const show = pwdInput.type === 'password';
+    pwdInput.type = show ? 'text' : 'password';
+    eyeIcon.innerHTML = show ? EYE_SHUT : EYE_OPEN;
+  });
+
+  // Password strength
+  const colors  = ['#ef4444','#f97316','#eab308','#22c55e'];
+  const labels  = ['Weak','Fair','Good','Strong'];
+  pwdInput.addEventListener('input', () => {
+    const v = pwdInput.value;
+    let score = 0;
+    if (v.length >= 8)                score++;
+    if (/[A-Z]/.test(v))              score++;
+    if (/[0-9]/.test(v))              score++;
+    if (/[^A-Za-z0-9]/.test(v))       score++;
+    ['s1','s2','s3','s4'].forEach((id, i) => {
+      document.getElementById(id).style.background = i < score ? colors[score-1] : '#e5e7eb';
+    });
+    document.getElementById('strengthLabel').textContent = v.length ? labels[score-1] || '' : '';
+    document.getElementById('strengthLabel').style.color = v.length ? colors[score-1] : '#6b7280';
+  });
+
+  // Form submit
+  const form       = document.getElementById('signupForm');
+  const signupBtn  = document.getElementById('signupBtn');
+  const errorMsg   = document.getElementById('errorMsg');
+  const errorTxt   = document.getElementById('errorText');
+  const successMsg = document.getElementById('successMsg');
+
+  function showError(msg)   { errorTxt.textContent = msg; errorMsg.classList.add('show'); successMsg.classList.remove('show'); }
+  function showSuccess()    { successMsg.classList.add('show'); errorMsg.classList.remove('show'); }
+  function hideMessages()   { errorMsg.classList.remove('show'); successMsg.classList.remove('show'); }
+  function setLoading(v)    { signupBtn.disabled = v; signupBtn.classList.toggle('loading', v); }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); hideMessages();
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName  = document.getElementById('lastName').value.trim();
+    const email     = document.getElementById('email').value.trim();
+    const phone     = document.getElementById('phone').value.trim();
+    const password  = pwdInput.value;
+    const terms     = document.getElementById('terms').checked;
+
+    if (!firstName || !lastName || !email || !phone || !password) { showError('Please fill in all fields.'); return; }
+    if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
+    if (!/^\d{10}$/.test(phone)) { showError('Enter a valid 10-digit phone number.'); return; }
+    if (!terms) { showError('Please accept the Terms of Service to continue.'); return; }
+
+    const body = { first_name: firstName, last_name: lastName, email, phone, password, role: selectedRole };
+    setLoading(true);
+    try {
+      const res  = await fetch('/api/v1/accounts/register/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')}, body:JSON.stringify(body) });
+      const data = await res.json();
+      if (res.ok || res.status === 201) {
+        if (data.token)   localStorage.setItem('nestify_token', data.token);
+        if (data.access)  localStorage.setItem('nestify_token', data.access);
+        if (data.refresh) localStorage.setItem('nestify_refresh', data.refresh);
+        showSuccess();
+        setTimeout(() => { window.location.href = selectedRole === 'owner' ? '/owner-dashboard/' : '/listings/'; }, 1200);
+      } else {
+        const msg = data?.detail || data?.email?.[0] || data?.phone?.[0] || data?.non_field_errors?.[0] || data?.message || 'Registration failed. Please try again.';
+        showError(msg);
+      }
+    } catch { showError('Network error. Please check your connection.'); }
+    finally   { setLoading(false); }
+  });
+
+  function getCookie(name) { const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)'); return v ? v.pop() : ''; }
+</script>
 {% endblock %}
