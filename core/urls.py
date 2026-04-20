@@ -3,22 +3,22 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import login_view, signup_view, logout_view, ownerdashboard, home, pg, about, contact
+from .views import login, signup, logout, ownerdashboard, home, pg, about, contact
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     # API routes (DRF with namespace)
     path('api/v1/accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
-    path('api/v1/listings/', include('listings.urls')),
-    path('api/v1/bookings/', include('bookings.urls')),
-    path('api/v1/dashboard/', include('dashboard.urls')),
+    #path('api/v1/listings/', include('listings.urls')),
+    #path('api/v1/bookings/', include('bookings.urls')),
+    #path('api/v1/dashboard/', include('dashboard.urls')),
 
     # Frontend pages
     path('', home, name='home'),
-    path('login/', login_view, name='login'),
-    path('signup/', signup_view, name='signup'),
-    path('logout/', logout_view, name='logout'),
+    path('login/', login, name='login'),
+    path('signup/', signup, name='signup'),
+    path('logout/', logout, name='logout'),
     path('owner-dashboard/', ownerdashboard, name='owner-dashboard'),
     path('pg/', pg, name='pg'),
     path('about/', about, name='about'),
