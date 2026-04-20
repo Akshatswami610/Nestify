@@ -1,13 +1,193 @@
 {% extends 'base.html' %}
+{% block title %}Login – Nestify{% endblock %}
+
+{% block extra_head %}
+<style>
+  .auth-page { min-height: calc(100vh - 64px); display: grid; grid-template-columns: 1fr 1fr; }
+
+  /* LEFT */
+  .panel-left { position: relative; background: #1a1a2e; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 48px; }
+  .panel-left::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 70% 60% at 30% 20%, #ff9a8b55 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 70%, #ff5a5f44 0%, transparent 55%), radial-gradient(ellipse 80% 80% at 50% 50%, #2d1b3d 0%, #1a1a2e 100%); z-index:0; }
+  .blob { position:absolute; border-radius:50%; filter:blur(60px); opacity:.35; z-index:0; animation: float 8s ease-in-out infinite alternate; }
+  .blob-1 { width:340px; height:340px; background:#FF5A5F; top:-80px; left:-80px; animation-delay:0s; }
+  .blob-2 { width:260px; height:260px; background:#ff9a6c; bottom:80px; right:-60px; animation-delay:-3s; }
+  .blob-3 { width:180px; height:180px; background:#c84b8a; top:50%; left:55%; animation-delay:-5s; }
+  @keyframes float { from{transform:translate(0,0) scale(1);} to{transform:translate(20px,30px) scale(1.08);} }
+
+  .illustration { position:relative; z-index:1; margin-bottom:48px; align-self:center; }
+  .panel-copy { position:relative; z-index:1; }
+  .panel-copy h1 { font-family:'Fraunces',serif; font-weight:300; font-size:2.4rem; line-height:1.2; color:#fff; margin-bottom:12px; }
+  .panel-copy h1 em { font-style:italic; color:#FF9A8B; }
+  .panel-copy p { font-size:.95rem; color:rgba(255,255,255,.55); max-width:320px; line-height:1.6; }
+  .stats { display:flex; gap:12px; margin-top:28px; flex-wrap:wrap; }
+  .stat-pill { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:100px; padding:8px 18px; color:rgba(255,255,255,.8); font-size:.78rem; font-weight:500; backdrop-filter:blur(8px); display:flex; align-items:center; gap:6px; }
+
+  /* RIGHT */
+  .panel-right { display:flex; align-items:center; justify-content:center; padding:40px 24px; background:#f9f7f5; }
+  .card { background:#fff; border-radius:24px; box-shadow:0 8px 40px rgba(0,0,0,.10); padding:48px 44px; width:100%; max-width:420px; animation:slideUp .5s cubic-bezier(.16,1,.3,1) both; }
+  @keyframes slideUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
+
+  .card-title { font-family:'Fraunces',serif; font-size:1.7rem; font-weight:400; color:#1a1a2e; margin-bottom:4px; }
+  .card-sub { font-size:.875rem; color:#6b7280; margin-bottom:32px; }
+
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:.78rem; font-weight:600; color:#1a1a2e; margin-bottom:6px; letter-spacing:.03em; text-transform:uppercase; }
+  .input-wrap { position:relative; }
+  .input-wrap .ico { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:#b0b7c3; display:flex; align-items:center; pointer-events:none; transition:color .2s; }
+  .input-wrap input { width:100%; padding:13px 14px 13px 42px; border:1.5px solid #e5e7eb; border-radius:12px; font-size:.95rem; font-family:'DM Sans',sans-serif; color:#1a1a2e; background:#fafafa; outline:none; transition:border-color .2s,box-shadow .2s,background .2s; }
+  .input-wrap input::placeholder { color:#b0b7c3; }
+  .input-wrap input:focus { border-color:#FF5A5F; background:#fff; box-shadow:0 0 0 3px rgba(255,90,95,.1); }
+  .pwd-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#b0b7c3; display:flex; align-items:center; transition:color .2s; }
+  .pwd-toggle:hover { color:#FF5A5F; }
+  .forgot { text-align:right; margin-top:-8px; margin-bottom:20px; }
+  .forgot a { font-size:.8rem; color:#6b7280; text-decoration:none; transition:color .2s; }
+  .forgot a:hover { color:#FF5A5F; }
+
+  .error-msg { display:none; background:#fff1f1; border:1px solid #ffc5c5; color:#c0392b; border-radius:10px; padding:11px 14px; font-size:.83rem; margin-bottom:16px; }
+  .error-msg.show { display:flex; align-items:center; gap:8px; animation:shake .35s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+
+  .btn-primary { width:100%; padding:14px; background:#FF5A5F; color:#fff; border:none; border-radius:12px; font-size:1rem; font-weight:600; font-family:'DM Sans',sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:background .2s,transform .15s,box-shadow .2s; box-shadow:0 4px 16px rgba(255,90,95,.3); }
+  .btn-primary:hover:not(:disabled) { background:#e04a4f; transform:translateY(-1px); box-shadow:0 8px 24px rgba(255,90,95,.35); }
+  .btn-primary:disabled { opacity:.7; cursor:not-allowed; }
+  .spinner { width:18px; height:18px; border:2px solid rgba(255,255,255,.4); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; display:none; }
+  .btn-primary.loading .spinner { display:block; }
+  .btn-primary.loading .btn-text { display:none; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+
+  .auth-link { text-align:center; margin-top:22px; font-size:.875rem; color:#6b7280; }
+  .auth-link a { color:#FF5A5F; font-weight:600; text-decoration:none; }
+  .auth-link a:hover { opacity:.8; }
+
+  @media (max-width:768px) {
+    .auth-page { grid-template-columns:1fr; }
+    .panel-left { display:none; }
+    .panel-right { padding:24px 16px; min-height:calc(100vh - 64px); }
+    .card { padding:36px 24px; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2>Login</h2>
+<div class="auth-page">
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" placeholder="Username"><br><br>
-    <input type="password" placeholder="Password"><br><br>
-    <button type="submit">Login</button>
-</form>
+  <div class="panel-left">
+    <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
+    <div class="illustration">
+      <svg width="300" height="240" viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="160" cy="230" rx="130" ry="18" fill="rgba(255,90,95,.15)"/>
+        <rect x="60" y="40" width="56" height="190" rx="4" fill="#2a2040" opacity=".9"/>
+        <rect x="70" y="55" width="10" height="12" rx="2" fill="#ffcb77" opacity=".7"/><rect x="88" y="55" width="10" height="12" rx="2" fill="#ff9a8b" opacity=".6"/>
+        <rect x="70" y="78" width="10" height="12" rx="2" fill="#ff9a8b" opacity=".5"/><rect x="88" y="78" width="10" height="12" rx="2" fill="#ffcb77" opacity=".8"/>
+        <rect x="70" y="101" width="10" height="12" rx="2" fill="#ffcb77" opacity=".6"/><rect x="70" y="124" width="10" height="12" rx="2" fill="#ff9a8b" opacity=".7"/>
+        <rect x="70" y="147" width="10" height="12" rx="2" fill="#ffcb77" opacity=".8"/><rect x="70" y="170" width="10" height="12" rx="2" fill="#ff9a8b" opacity=".6"/>
+        <rect x="130" y="70" width="72" height="160" rx="4" fill="#221833" opacity=".95"/>
+        <rect x="140" y="82" width="12" height="14" rx="2" fill="#ffcb77" opacity=".9"/><rect x="160" y="82" width="12" height="14" rx="2" fill="#ff9a8b" opacity=".7"/><rect x="180" y="82" width="12" height="14" rx="2" fill="#ffcb77" opacity=".5"/>
+        <rect x="140" y="108" width="12" height="14" rx="2" fill="#ff9a8b" opacity=".6"/><rect x="160" y="108" width="12" height="14" rx="2" fill="#ffcb77" opacity=".8"/><rect x="180" y="108" width="12" height="14" rx="2" fill="#ff9a8b" opacity=".9"/>
+        <rect x="140" y="134" width="12" height="14" rx="2" fill="#ffcb77" opacity=".7"/><rect x="160" y="160" width="12" height="14" rx="2" fill="#ffcb77" opacity=".9"/>
+        <rect x="154" y="208" width="24" height="22" rx="3" fill="#ff5a5f" opacity=".6"/>
+        <rect x="215" y="90" width="62" height="140" rx="4" fill="#1e1530" opacity=".9"/>
+        <rect x="224" y="102" width="10" height="12" rx="2" fill="#ffcb77" opacity=".7"/><rect x="242" y="102" width="10" height="12" rx="2" fill="#ff9a8b" opacity=".5"/><rect x="258" y="125" width="10" height="12" rx="2" fill="#ffcb77" opacity=".9"/>
+        <rect x="224" y="148" width="10" height="12" rx="2" fill="#ffcb77" opacity=".7"/><rect x="242" y="171" width="10" height="12" rx="2" fill="#ff9a8b" opacity=".8"/>
+        <rect x="40" y="229" width="240" height="3" rx="2" fill="rgba(255,255,255,.08)"/>
+        <circle cx="270" cy="30" r="18" fill="rgba(255,203,119,.15)" stroke="rgba(255,203,119,.3)" stroke-width="1"/>
+        <circle cx="278" cy="26" r="12" fill="#1a1a2e"/>
+        <circle cx="40" cy="25" r="1.5" fill="#fff" opacity=".6"/><circle cx="100" cy="15" r="1" fill="#fff" opacity=".5"/><circle cx="180" cy="22" r="1.5" fill="#fff" opacity=".7"/>
+        <path d="M166 49C162.5 49 160 51.5 160 55C160 59.5 166 65 166 65C166 65 172 59.5 172 55C172 51.5 169.5 49 166 49Z" fill="#FF5A5F"/>
+        <circle cx="166" cy="55" r="3.5" fill="white"/>
+      </svg>
+    </div>
+    <div class="panel-copy">
+      <h1>Your next <em>home</em><br>is a click away.</h1>
+      <p>Thousands of verified PGs and rooms waiting for you across India's top cities.</p>
+      <div class="stats">
+        <div class="stat-pill">🏠 12,000+ Listings</div>
+        <div class="stat-pill">✅ Verified Owners</div>
+        <div class="stat-pill">📍 30+ Cities</div>
+      </div>
+    </div>
+  </div>
 
+  <div class="panel-right">
+    <div class="card">
+      <h2 class="card-title">Welcome back</h2>
+      <p class="card-sub">Find your perfect PG — sign in to continue.</p>
+
+      <div class="error-msg" id="errorMsg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <span id="errorText">Invalid credentials. Please try again.</span>
+      </div>
+
+      <form id="loginForm" novalidate>
+        {% csrf_token %}
+        <div class="field">
+          <label for="emailPhone">Email or Phone</label>
+          <div class="input-wrap">
+            <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <input type="text" id="emailPhone" name="email" placeholder="you@example.com or 9876543210" autocomplete="username" required/>
+          </div>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required/>
+            <button type="button" class="pwd-toggle" id="pwdToggle">
+              <svg id="eyeIcon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="forgot"><a href="/accounts/password-reset/">Forgot password?</a></div>
+        <button type="submit" class="btn-primary" id="loginBtn">
+          <div class="spinner"></div>
+          <span class="btn-text">Login to Nestify</span>
+        </button>
+      </form>
+      <p class="auth-link">Don't have an account? <a href="/signup/">Sign up free</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const pwdInput  = document.getElementById('password');
+  const pwdToggle = document.getElementById('pwdToggle');
+  const eyeIcon   = document.getElementById('eyeIcon');
+  const EYE_OPEN  = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>`;
+  const EYE_SHUT  = `<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>`;
+  pwdToggle.addEventListener('click', () => {
+    const show = pwdInput.type === 'password';
+    pwdInput.type = show ? 'text' : 'password';
+    eyeIcon.innerHTML = show ? EYE_SHUT : EYE_OPEN;
+  });
+  const form = document.getElementById('loginForm');
+  const loginBtn = document.getElementById('loginBtn');
+  const errorMsg = document.getElementById('errorMsg');
+  const errorTxt = document.getElementById('errorText');
+  function showError(msg) { errorTxt.textContent = msg; errorMsg.classList.add('show'); }
+  function hideError()    { errorMsg.classList.remove('show'); }
+  function setLoading(v)  { loginBtn.disabled = v; loginBtn.classList.toggle('loading', v); }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); hideError();
+    const raw  = document.getElementById('emailPhone').value.trim();
+    const pass = document.getElementById('password').value;
+    if (!raw || !pass) { showError('Please fill in all fields.'); return; }
+    const isPhone = /^\d{10}$/.test(raw.replace(/\s/g,''));
+    const body = isPhone ? { phone: raw, password: pass } : { email: raw, password: pass };
+    setLoading(true);
+    try {
+      const res  = await fetch('/api/v1/accounts/login/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')}, body:JSON.stringify(body) });
+      const data = await res.json();
+      if (res.ok) {
+        if (data.token)   localStorage.setItem('nestify_token', data.token);
+        if (data.access)  localStorage.setItem('nestify_token', data.access);
+        if (data.refresh) localStorage.setItem('nestify_refresh', data.refresh);
+        window.location.href = '/owner-dashboard/';
+      } else { showError(data?.detail || data?.non_field_errors?.[0] || data?.message || 'Invalid credentials. Please try again.'); }
+    } catch { showError('Network error. Please check your connection.'); }
+    finally   { setLoading(false); }
+  });
+  function getCookie(name) { const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)'); return v ? v.pop() : ''; }
+</script>
 {% endblock %}
