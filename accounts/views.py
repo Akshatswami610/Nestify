@@ -22,9 +22,7 @@ class LoginView(APIView):
 
     def post(self, request):
         serializer = LoginSerializer(data={
-            "identifier": request.data.get("email")
-                          or request.data.get("phone_number")
-                          or request.data.get("username"),
+            "identifier": request.data.get("identifier"),
             "password": request.data.get("password")
         })
 
