@@ -167,20 +167,11 @@
         {% csrf_token %}
         <input type="hidden" id="roleInput" name="role" value="tenant"/>
 
-        <div class="field-row">
-          <div class="field">
-            <label for="firstName">First Name</label>
-            <div class="input-wrap">
-              <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-              <input type="text" id="firstName" name="first_name" placeholder="Aarav" required/>
-            </div>
-          </div>
-          <div class="field">
-            <label for="lastName">Last Name</label>
-            <div class="input-wrap">
-              <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-              <input type="text" id="lastName" name="last_name" placeholder="Sharma" required/>
-            </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <div class="input-wrap">
+            <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            <input type="text" id="username" name="username" placeholder="aarav_sharma" autocomplete="username" required/>
           </div>
         </div>
 
@@ -193,10 +184,10 @@
         </div>
 
         <div class="field">
-          <label for="phone">Phone Number</label>
+          <label for="phone_number">Phone Number</label>
           <div class="input-wrap">
             <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
-            <input type="tel" id="phone" name="phone" placeholder="9876543210" autocomplete="tel" required/>
+            <input type="tel" id="phone_number" name="phone_number" placeholder="9876543210" autocomplete="tel" required/>
           </div>
         </div>
 
@@ -229,7 +220,7 @@
         </button>
       </form>
 
-      <p class="auth-link">Already have an account? <a href="/login/">Log in</a></p>
+      <p class="auth-link">Already have an account? <a href="/accounts/login/">Log in</a></p>
     </div>
   </div>
 
@@ -292,19 +283,21 @@
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault(); hideMessages();
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName  = document.getElementById('lastName').value.trim();
-    const email     = document.getElementById('email').value.trim();
-    const phone     = document.getElementById('phone').value.trim();
-    const password  = pwdInput.value;
-    const terms     = document.getElementById('terms').checked;
+    const username     = document.getElementById('username').value.trim();
+    const email        = document.getElementById('email').value.trim();
+    const phone_number = document.getElementById('phone_number').value.trim();
+    const password     = pwdInput.value;
+    const terms        = document.getElementById('terms').checked;
 
-    if (!firstName || !lastName || !email || !phone || !password) { showError('Please fill in all fields.'); return; }
+    // --- Client-side validation ---
+    if (!username || !email || !phone_number || !password) { showError('Please fill in all fields.'); return; }
+    if (username.length < 3) { showError('Username must be at least 3 characters.'); return; }
     if (password.length < 8) { showError('Password must be at least 8 characters.'); return; }
-    if (!/^\d{10}$/.test(phone)) { showError('Enter a valid 10-digit phone number.'); return; }
+    if (!/^\d{10}$/.test(phone_number)) { showError('Enter a valid 10-digit phone number.'); return; }
     if (!terms) { showError('Please accept the Terms of Service to continue.'); return; }
 
-    const body = { first_name: firstName, last_name: lastName, email, phone, password, role: selectedRole };
+    // --- Matches RegisterSerializer fields exactly: username, email, password, phone_number ---
+    const body = { username, email, phone_number, password };
     setLoading(true);
     try {
       const res  = await fetch('/api/v1/accounts/register/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')}, body:JSON.stringify(body) });
@@ -314,9 +307,18 @@
         if (data.access)  localStorage.setItem('nestify_token', data.access);
         if (data.refresh) localStorage.setItem('nestify_refresh', data.refresh);
         showSuccess();
-        setTimeout(() => { window.location.href = selectedRole === 'owner' ? '/owner-dashboard/' : '/listings/'; }, 1200);
+        setTimeout(() => { window.location.href = '/owner-dashboard/'; }, 1200);
       } else {
-        const msg = data?.detail || data?.email?.[0] || data?.phone?.[0] || data?.non_field_errors?.[0] || data?.message || 'Registration failed. Please try again.';
+        // Map serializer error keys: username, email, phone_number, password, non_field_errors
+        const msg =
+          data?.username?.[0]     ||
+          data?.email?.[0]        ||
+          data?.phone_number?.[0] ||
+          data?.password?.[0]     ||
+          data?.non_field_errors?.[0] ||
+          data?.detail            ||
+          data?.message           ||
+          'Registration failed. Please try again.';
         showError(msg);
       }
     } catch { showError('Network error. Please check your connection.'); }
