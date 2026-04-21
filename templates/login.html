@@ -121,10 +121,10 @@
       <form id="loginForm" novalidate>
         {% csrf_token %}
         <div class="field">
-          <label for="identifier">Email, Phone or Username</label>
+          <label for="emailPhone">Email or Phone</label>
           <div class="input-wrap">
             <svg class="ico" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            <input type="text" id="identifier" name="identifier" placeholder="you@example.com, 9876543210 or username" autocomplete="username" required/>
+            <input type="text" id="emailPhone" name="email" placeholder="you@example.com or 9876543210" autocomplete="username" required/>
           </div>
         </div>
         <div class="field">
@@ -143,7 +143,7 @@
           <span class="btn-text">Login to Nestify</span>
         </button>
       </form>
-      <p class="auth-link">Don't have an account? <a href="/accounts/signup/">Sign up free</a></p>
+      <p class="auth-link">Don't have an account? <a href="/signup/">Sign up free</a></p>
     </div>
   </div>
 </div>
@@ -170,12 +170,11 @@
   function setLoading(v)  { loginBtn.disabled = v; loginBtn.classList.toggle('loading', v); }
   form.addEventListener('submit', async (e) => {
     e.preventDefault(); hideError();
-    const identifier = document.getElementById('identifier').value.trim();
-    const pass       = document.getElementById('password').value;
-    if (!identifier || !pass) { showError('Please fill in all fields.'); return; }
-
-    // LoginSerializer expects: { identifier, password }
-    const body = { identifier, password: pass };
+    const raw  = document.getElementById('emailPhone').value.trim();
+    const pass = document.getElementById('password').value;
+    if (!raw || !pass) { showError('Please fill in all fields.'); return; }
+    const isPhone = /^\d{10}$/.test(raw.replace(/\s/g,''));
+    const body = isPhone ? { phone: raw, password: pass } : { email: raw, password: pass };
     setLoading(true);
     try {
       const res  = await fetch('/api/v1/accounts/login/', { method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken':getCookie('csrftoken')}, body:JSON.stringify(body) });
@@ -185,10 +184,7 @@
         if (data.access)  localStorage.setItem('nestify_token', data.access);
         if (data.refresh) localStorage.setItem('nestify_refresh', data.refresh);
         window.location.href = '/owner-dashboard/';
-      } else {
-        // LoginSerializer raises under non_field_errors or detail
-        showError(data?.non_field_errors?.[0] || data?.detail || data?.message || 'Invalid credentials. Please try again.');
-      }
+      } else { showError(data?.detail || data?.non_field_errors?.[0] || data?.message || 'Invalid credentials. Please try again.'); }
     } catch { showError('Network error. Please check your connection.'); }
     finally   { setLoading(false); }
   });
