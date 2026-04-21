@@ -12,20 +12,29 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'phone_number']
+        fields = ['company_name', 'email', 'phone_number', 'password']
 
     def validate_email(self, value):
-        if value and User.objects.filter(email=value).exists():
+        if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("Email already exists")
         return value
 
     def validate_phone_number(self, value):
-        if value and User.objects.filter(phone_number=value).exists():
+        if User.objects.filter(phone_number=value).exists():
             raise serializers.ValidationError("Phone number already exists")
         return value
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        email = validated_data['email']
+
+        user = User.objects.create_user(
+            username=email,  # ✅ use email as username internally
+            email=email,
+            phone_number=validated_data['phone_number'],
+            company_name=validated_data['company_name'],
+            password=validated_data['password']
+        )
+        return user
 
 
 # -----------------------------
@@ -37,15 +46,12 @@ class LoginSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = authenticate(
-            username=data['identifier'],
+            username=data['identifier'],  # email
             password=data['password']
         )
 
         if not user:
-            raise serializers.ValidationError("Invalid credentials")
-
-        if not user.is_active:
-            raise serializers.ValidationError("User account is disabled")
+            raise serializers.ValidationError("Invalid email or password")
 
         return user
 
