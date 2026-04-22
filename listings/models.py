@@ -16,6 +16,7 @@ class PG(models.Model):
 
     rent = models.IntegerField()
     deposit = models.IntegerField(blank=True, null=True)
+    booking_fees = models.IntegerField(blank=True, null=True)
 
     location = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
