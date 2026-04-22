@@ -1,12 +1,512 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ pg.name }} – Nestify{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── BREADCRUMB ── */
+  .breadcrumb {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 32px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  .breadcrumb a { color: var(--muted); text-decoration: none; transition: color .2s; }
+  .breadcrumb a:hover { color: var(--coral); }
+  .breadcrumb svg { flex-shrink: 0; }
+
+  /* ── DETAIL LAYOUT ── */
+  .detail-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 32px 64px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  /* ── GALLERY ── */
+  .gallery-main {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #f0ede9;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .gallery-main img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: opacity .3s;
+  }
+  .gallery-main-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    background: linear-gradient(135deg, #f0ebe6, #e8e2dc);
+  }
+  .gallery-thumbs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .thumb {
+    width: 72px; height: 52px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color .2s;
+    flex-shrink: 0;
+  }
+  .thumb.active { border-color: var(--coral); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── PG INFO ── */
+  .pg-header { margin: 28px 0 0; }
+  .pg-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .pg-title {
+    font-family: 'Fraunces', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -.03em;
+    line-height: 1.2;
+  }
+  .pg-avail-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .pg-avail-badge.avail { background: #d1fae5; color: #065f46; }
+  .pg-avail-badge.full  { background: #fee2e2; color: #991b1b; }
+  .pg-avail-badge::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .pg-location-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: .9rem;
+    margin: 10px 0 20px;
+  }
+
+  /* ── TABS ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color .2s, border-color .2s;
+  }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--coral); font-weight: 600; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .pg-description {
+    font-size: .95rem;
+    line-height: 1.75;
+    color: #374151;
+  }
+
+  /* ── FACILITIES GRID ── */
+  .facilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .facility-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 12px;
+    border-radius: 12px;
+    font-size: .8rem;
+    font-weight: 500;
+    text-align: center;
+    border: 1.5px solid var(--border);
+  }
+  .facility-item.has  { color: #065f46; background: #f0fdf4; border-color: #a7f3d0; }
+  .facility-item.none { color: var(--muted); background: #fafafa; border-color: var(--border); opacity: .55; }
+  .facility-item .fac-icon { font-size: 1.4rem; }
+
+  /* ── STICKY BOOKING CARD ── */
+  .booking-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    position: sticky;
+    top: 80px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.07);
+  }
+  .price-display {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .price-main {
+    font-family: 'Fraunces', serif;
+    font-size: 2.2rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -.03em;
+  }
+  .price-mo { font-size: .9rem; color: var(--muted); }
+  .deposit-note {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: .85rem;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row:last-of-type { border-bottom: none; }
+  .detail-row .label { color: var(--muted); }
+  .detail-row .value { font-weight: 500; color: var(--ink); }
+  .detail-row .gender-chip {
+    display: inline-block;
+    background: rgba(255,90,95,.1);
+    color: var(--coral);
+    padding: 2px 10px;
+    border-radius: 100px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+
+  .btn-book {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 16px rgba(255,90,95,.3);
+    text-align: center;
+    text-decoration: none;
+  }
+  .btn-book:hover { background: var(--coral-d); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,90,95,.35); }
+  .btn-book:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .btn-book-ghost {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    background: none;
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+    text-align: center;
+  }
+  .btn-book-ghost:hover { border-color: var(--ink); background: #f9f7f5; }
+
+  .owner-note {
+    margin-top: 18px;
+    padding: 12px 14px;
+    background: #f9f7f5;
+    border-radius: 10px;
+    font-size: .78rem;
+    color: var(--muted);
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  /* ── LOADING / ERROR ── */
+  .page-loading {
+    text-align: center;
+    padding: 100px 20px;
+    color: var(--muted);
+  }
+  .page-loading .spin {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--coral);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    .detail-wrap {
+      grid-template-columns: 1fr;
+      padding: 20px 20px 48px;
+    }
+    .booking-card { position: static; }
+    .breadcrumb { padding: 16px 20px 0; }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>PG Name</h2>
 
-<p>Location: XYZ</p>
-<p>Rent: ₹5000</p>
-<p>Facilities: WiFi, Food, Laundry</p>
+<!-- Loading state -->
+<div id="pageLoading" class="page-loading">
+  <div class="spin"></div>
+  <p>Loading PG details…</p>
+</div>
 
-<button>Book Visit</button>
+<!-- Main content (hidden until loaded) -->
+<div id="pageContent" style="display:none;">
 
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" id="breadcrumb">
+    <a href="/">Home</a>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    <span id="breadcrumbName">PG Details</span>
+  </nav>
+
+  <div class="detail-wrap">
+
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- Gallery -->
+      <div class="gallery-main" id="galleryMain">
+        <div class="gallery-main-placeholder" id="galleryPlaceholder">🏠</div>
+      </div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+
+      <!-- PG Header -->
+      <div class="pg-header">
+        <div class="pg-header-top">
+          <h1 class="pg-title" id="pgName">—</h1>
+          <span class="pg-avail-badge" id="availBadge"></span>
+        </div>
+        <div class="pg-location-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--coral)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span id="pgLocation">—</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="about">About</button>
+          <button class="tab-btn" data-tab="facilities">Facilities</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-about">
+          <p class="pg-description" id="pgDescription">—</p>
+        </div>
+        <div class="tab-panel" id="tab-facilities">
+          <div class="facilities-grid" id="facilitiesGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN — Booking Card -->
+    <div>
+      <div class="booking-card">
+        <div class="price-display">
+          <span class="price-main" id="pgRent">₹—</span>
+          <span class="price-mo">/ month</span>
+        </div>
+        <div class="deposit-note" id="depositNote"></div>
+
+        <div class="detail-row">
+          <span class="label">City</span>
+          <span class="value" id="detailCity">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Gender</span>
+          <span class="value"><span class="gender-chip" id="detailGender">—</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Status</span>
+          <span class="value" id="detailStatus">—</span>
+        </div>
+
+        <button class="btn-book" id="bookBtn">Book a Visit</button>
+        <button class="btn-book-ghost" id="contactBtn">Contact Owner</button>
+
+        <p class="owner-note">Free to enquire. No booking fees.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Extract PG id from URL: /pg/<id>/
+  function getPgId() {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    // path: /pg/123/ → ['pg', '123']
+    const idx = parts.indexOf('pg');
+    return idx !== -1 && parts[idx + 1] ? parts[idx + 1] : null;
+  }
+
+  const pgId = getPgId();
+  const API_BASE = 'http://127.0.0.1:8000/api/v1/listings/pgs/';
+
+  // ── Fetch & render ──
+  async function loadPG() {
+    if (!pgId) { showError('Invalid PG URL.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}${pgId}/`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const pg = await res.json();
+      render(pg);
+    } catch (err) {
+      console.error(err);
+      showError('Could not load this PG. Please try again.');
+    }
+  }
+
+  function showError(msg) {
+    document.getElementById('pageLoading').innerHTML = `
+      <div style="font-size:2rem;margin-bottom:12px">⚠️</div>
+      <p style="color:var(--ink);font-weight:600;margin-bottom:6px">Oops!</p>
+      <p>${msg}</p>
+      <a href="/" style="display:inline-block;margin-top:20px;color:var(--coral);font-weight:600;text-decoration:none;">← Back to listings</a>`;
+  }
+
+  function render(pg) {
+    document.getElementById('pageLoading').style.display = 'none';
+    document.getElementById('pageContent').style.display = 'block';
+
+    // Breadcrumb
+    document.getElementById('breadcrumbName').textContent = pg.name;
+    document.title = `${pg.name} – Nestify`;
+
+    // Header
+    document.getElementById('pgName').textContent = pg.name;
+    document.getElementById('pgLocation').textContent = `${pg.location}, ${pg.city}`;
+    const badge = document.getElementById('availBadge');
+    badge.textContent = pg.is_available ? 'Available' : 'Fully Booked';
+    badge.className = `pg-avail-badge ${pg.is_available ? 'avail' : 'full'}`;
+
+    // Description
+    document.getElementById('pgDescription').textContent = pg.description || 'No description provided.';
+
+    // Price
+    document.getElementById('pgRent').textContent = `₹${parseInt(pg.rent).toLocaleString('en-IN')}`;
+    document.getElementById('depositNote').textContent = pg.deposit
+      ? `Security deposit: ₹${parseInt(pg.deposit).toLocaleString('en-IN')}`
+      : 'No deposit information';
+
+    // Booking card details
+    document.getElementById('detailCity').textContent = pg.city;
+    const genderMap = { male: '♂ Male', female: '♀ Female', any: '⚥ Any / Co-living' };
+    document.getElementById('detailGender').textContent = genderMap[pg.gender_preference] || pg.gender_preference;
+    document.getElementById('detailStatus').textContent = pg.is_available ? '✅ Available now' : '❌ Fully booked';
+
+    // Book button
+    const bookBtn = document.getElementById('bookBtn');
+    if (!pg.is_available) {
+      bookBtn.disabled = true;
+      bookBtn.textContent = 'Currently Full';
+    }
+
+    // Gallery
+    if (pg.images && pg.images.length > 0) {
+      document.getElementById('galleryPlaceholder').style.display = 'none';
+      const mainEl = document.getElementById('galleryMain');
+      const mainImg = document.createElement('img');
+      mainImg.src = pg.images[0].image;
+      mainImg.alt = pg.name;
+      mainEl.appendChild(mainImg);
+
+      if (pg.images.length > 1) {
+        const thumbsEl = document.getElementById('galleryThumbs');
+        pg.images.forEach((imgObj, i) => {
+          const thumb = document.createElement('div');
+          thumb.className = `thumb ${i === 0 ? 'active' : ''}`;
+          thumb.innerHTML = `<img src="${imgObj.image}" alt="Photo ${i+1}">`;
+          thumb.addEventListener('click', () => {
+            mainImg.src = imgObj.image;
+            thumbsEl.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+          });
+          thumbsEl.appendChild(thumb);
+        });
+      }
+    }
+
+    // Facilities
+    const facs = [
+      { key: 'wifi',    icon: '📶', label: 'WiFi' },
+      { key: 'food',    icon: '🍽️', label: 'Food' },
+      { key: 'laundry', icon: '👕', label: 'Laundry' },
+      { key: 'ac',      icon: '❄️', label: 'AC' },
+      { key: 'parking', icon: '🅿️', label: 'Parking' },
+    ];
+    const grid = document.getElementById('facilitiesGrid');
+    grid.innerHTML = facs.map(f => `
+      <div class="facility-item ${pg[f.key] ? 'has' : 'none'}">
+        <span class="fac-icon">${f.icon}</span>
+        <span>${f.label}</span>
+        ${pg[f.key] ? '' : '<span style="font-size:.65rem;opacity:.7">Not available</span>'}
+      </div>`).join('');
+  }
+
+  // ── Tabs ──
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  loadPG();
+</script>
 {% endblock %}
