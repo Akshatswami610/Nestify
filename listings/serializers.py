@@ -12,12 +12,19 @@ class PGSerializer(serializers.ModelSerializer):
     images = PGImageSerializer(many=True, read_only=True)
     owner = serializers.ReadOnlyField(source='owner.username')
 
+    # for uploading multiple images
+    uploaded_images = serializers.ListField(
+        child=serializers.ImageField(),
+        write_only=True,
+        required=False
+    )
+
     class Meta:
         model = PG
         fields = [
             'id',
             'owner',
-            'title',
+            'name',
             'description',
             'rent',
             'deposit',
@@ -30,7 +37,7 @@ class PGSerializer(serializers.ModelSerializer):
             'parking',
             'gender_preference',
             'is_available',
-            'image',
-            'images',
             'created_at',
+            'images',           # for GET
+            'uploaded_images',  # for POST
         ]
