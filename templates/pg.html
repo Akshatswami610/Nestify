@@ -437,10 +437,16 @@
     document.getElementById('pgDescription').textContent = pg.description || 'No description provided.';
 
     // Price
-    document.getElementById('pgRent').textContent = `₹${parseInt(pg.rent).toLocaleString('en-IN')}`;
-    document.getElementById('depositNote').textContent = pg.deposit
-      ? `Security deposit: ₹${parseInt(pg.deposit).toLocaleString('en-IN')}`
-      : 'No deposit information';
+    document.getElementById('pgRent').textContent =
+      pg.rent ? `₹${Number(pg.rent).toLocaleString('en-IN')}` : 'N/A';
+
+    document.getElementById('depositNote').textContent =
+      pg.deposit
+        ? `Security deposit: ₹${Number(pg.deposit).toLocaleString('en-IN')}`
+        : 'No deposit information';
+
+    document.getElementById('booking_fees').textContent =
+      pg.booking_fees ? `₹${Number(pg.booking_fees).toLocaleString('en-IN')}` : 'N/A';
 
     // Booking card details
     document.getElementById('detailCity').textContent = pg.city;
