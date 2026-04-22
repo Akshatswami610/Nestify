@@ -21,5 +21,5 @@ def about(request):
 def contact(request):
     return render(request, 'contact.html')
 
-def pg(request):
+def pg(request, id=None):
     return render(request, 'pg.html')
