@@ -20,7 +20,7 @@ urlpatterns = [
     path('signup/', signup, name='signup'),
     path('logout/', logout, name='logout'),
     path('owner-dashboard/', ownerdashboard, name='owner-dashboard'),
-    path('pg/', pg, name='pg'),
+    path('pg/<int:id>/', pg, name='pg_detail'),
     path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
 ]
