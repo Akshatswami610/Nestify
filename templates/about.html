@@ -1,6 +1,75 @@
 {% extends 'base.html' %}
 
+{% block title %}About – Nestify{% endblock %}
+
 {% block content %}
-<h2>About Us</h2>
-<p>This platform helps students find PGs easily.</p>
+
+<section style="max-width:1100px; margin:60px auto; padding:0 20px;">
+
+  <!-- Hero -->
+  <div style="text-align:center; margin-bottom:60px;">
+    <h1 style="font-size:2.5rem; font-weight:600; font-family:'Fraunces',serif;">
+      About Nestify
+    </h1>
+    <p style="margin-top:12px; color:#6b7280; font-size:1.05rem;">
+      Making PG hunting simple, transparent, and stress-free.
+    </p>
+  </div>
+
+  <!-- Story -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-bottom:60px;">
+
+    <div>
+      <h2 style="font-size:1.6rem; margin-bottom:12px;">Our Story</h2>
+      <p style="color:#6b7280; line-height:1.7;">
+        Finding a good PG near college or workplace is often confusing and time-consuming.
+        Nestify was built to simplify that process by connecting students directly with PG owners.
+      </p>
+      <p style="color:#6b7280; margin-top:12px; line-height:1.7;">
+        Our goal is to create a platform where users can easily explore, compare, and book visits
+        without unnecessary hassle.
+      </p>
+    </div>
+
+    <div>
+      <h2 style="font-size:1.6rem; margin-bottom:12px;">What We Offer</h2>
+      <ul style="color:#6b7280; line-height:1.8;">
+        <li>✔ Verified PG listings</li>
+        <li>✔ Easy search & filters</li>
+        <li>✔ Direct booking requests</li>
+        <li>✔ Owner dashboard for management</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- Mission -->
+  <div style="background:#fff; padding:40px; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.05); margin-bottom:60px;">
+    <h2 style="font-size:1.6rem; margin-bottom:10px;">Our Mission</h2>
+    <p style="color:#6b7280; line-height:1.7;">
+      To make accommodation discovery seamless and reliable for students and working professionals
+      by leveraging modern technology and user-friendly design.
+    </p>
+  </div>
+
+  <!-- CTA -->
+  <div style="text-align:center;">
+    <h2 style="margin-bottom:12px;">Ready to find your PG?</h2>
+    <a href="/" style="
+        display:inline-block;
+        background:#FF5A5F;
+        color:white;
+        padding:12px 28px;
+        border-radius:999px;
+        text-decoration:none;
+        font-weight:600;
+        box-shadow:0 6px 16px rgba(255,90,95,0.3);
+        transition:0.2s;
+    ">
+      Explore Listings →
+    </a>
+  </div>
+
+</section>
+
 {% endblock %}
