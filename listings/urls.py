@@ -4,6 +4,6 @@ from .views import PGViewSet
 app_name = 'listings'
 
 router = DefaultRouter()
-router.register(r'pgs', PGViewSet, basename='pg')
+router.register(r'pgs', PGViewSet, basename='pg')  # ✅ clean name
 
-urlpatterns = router.urls
+urlpatterns = router.urls   # ✅ VERY IMPORTANT
