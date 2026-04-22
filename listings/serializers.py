@@ -28,6 +28,7 @@ class PGSerializer(serializers.ModelSerializer):
             'description',
             'rent',
             'deposit',
+            'booking_fees',
             'location',
             'city',
             'wifi',
