@@ -11,7 +11,7 @@ urlpatterns = [
     # API routes (DRF with namespace)
     path('api/v1/accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('api/v1/listings/', include('listings.urls')),
-    #path('api/v1/bookings/', include('bookings.urls')),
+    #path('api/v1/requests/', include('requests.urls')),
     #path('api/v1/dashboard/', include('dashboard.urls')),
 
     # Frontend pages
