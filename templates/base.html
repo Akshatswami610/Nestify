@@ -200,10 +200,78 @@
     }
     .footer-bottom span { color: var(--coral); font-weight: 600; }
 
+    /* ── AUTH NAV (logged-in state) ── */
+    .nav-actions-auth { display: flex; align-items: center; gap: 10px; }
+
+    .btn-nav-requests {
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--ink);
+      padding: 8px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .btn-nav-requests:hover { border-color: var(--coral); background: #fff5f5; color: var(--coral); }
+
+    .requests-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 18px; height: 18px;
+      background: var(--coral);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 700;
+      border-radius: 100px;
+      padding: 0 5px;
+      line-height: 1;
+    }
+
+    .btn-nav-dashboard {
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 600;
+      color: #fff;
+      padding: 8px 20px;
+      background: var(--coral);
+      border-radius: 100px;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 12px rgba(255,90,95,.25);
+    }
+    .btn-nav-dashboard:hover { background: var(--coral-d); transform: translateY(-1px); }
+
+    .btn-nav-logout {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 8px 16px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color .2s, color .2s, background .2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-nav-logout:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+
+    /* avatar chip */
+    .nav-avatar {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--coral), #ff9a6c);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .8rem; color: #fff;
+      flex-shrink: 0;
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
       nav { padding: 0 20px; }
-      .nav-links, .nav-actions { display: none; }
+      .nav-links, .nav-actions, .nav-actions-auth { display: none; }
       .nav-hamburger { display: flex; }
       .footer-links { gap: 28px; }
     }
@@ -226,9 +294,34 @@
     <a href="/about/">About</a>
   </div>
 
-  <div class="nav-actions">
+  <!-- Guest actions (shown when logged out) -->
+  <div class="nav-actions" id="nav-guest">
     <a href="/login/" class="btn-nav-ghost">Login</a>
     <a href="/signup/" class="btn-nav-primary">Sign Up Free</a>
+  </div>
+
+  <!-- Auth actions (shown when logged in) -->
+  <div class="nav-actions-auth" id="nav-auth" style="display:none;">
+    <a href="/owner-dashboard/requests/" class="btn-nav-requests" id="nav-requests-btn" title="Requests Received">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+      </svg>
+      Requests
+      <span class="requests-badge" id="nav-requests-count" style="display:none;">0</span>
+    </a>
+    <a href="/owner-dashboard/" class="btn-nav-dashboard">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+      </svg>
+      Dashboard
+    </a>
+    <div class="nav-avatar" id="nav-avatar" title="My Account">?</div>
+    <button class="btn-nav-logout" id="nav-logout-btn" title="Logout">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+      </svg>
+      Logout
+    </button>
   </div>
 
   <button class="nav-hamburger" id="hamburger" aria-label="Menu">
@@ -240,8 +333,13 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="/">Home</a>
   <a href="/about/">About</a>
-  <a href="/login/">Login</a>
-  <a href="/signup/" class="mob-cta">Sign Up Free →</a>
+  <!-- Guest links -->
+  <a href="/login/" id="mob-login">Login</a>
+  <a href="/signup/" class="mob-cta" id="mob-signup">Sign Up Free →</a>
+  <!-- Auth links (hidden by default) -->
+  <a href="/owner-dashboard/requests/" id="mob-requests" style="display:none;">📨 Requests Received</a>
+  <a href="/owner-dashboard/" id="mob-dashboard" style="display:none;">🏠 Dashboard</a>
+  <a href="#" id="mob-logout" class="mob-cta" style="display:none;background:#ef4444;">Logout →</a>
 </div>
 
 <!-- ── MAIN CONTENT ── -->
@@ -276,12 +374,77 @@
 </footer>
 
 <script>
-  // Mobile menu toggle
-  const hamburger   = document.getElementById('hamburger');
-  const mobileMenu  = document.getElementById('mobileMenu');
+  /* ── Mobile menu toggle ──────────────────────────────────────── */
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
   hamburger.addEventListener('click', () => mobileMenu.classList.toggle('open'));
-  // Close on link click
   mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+  /* ── Auth-aware navbar ───────────────────────────────────────── */
+  (function initNavAuth() {
+    const token = localStorage.getItem('nestify_token');
+
+    // Desktop refs
+    const navGuest  = document.getElementById('nav-guest');
+    const navAuth   = document.getElementById('nav-auth');
+    const navAvatar = document.getElementById('nav-avatar');
+    const logoutBtn = document.getElementById('nav-logout-btn');
+    const reqCount  = document.getElementById('nav-requests-count');
+
+    // Mobile refs
+    const mobLogin     = document.getElementById('mob-login');
+    const mobSignup    = document.getElementById('mob-signup');
+    const mobRequests  = document.getElementById('mob-requests');
+    const mobDashboard = document.getElementById('mob-dashboard');
+    const mobLogout    = document.getElementById('mob-logout');
+
+    function doLogout() {
+      localStorage.removeItem('nestify_token');
+      localStorage.removeItem('nestify_refresh');
+      window.location.href = '/login/';
+    }
+
+    if (token) {
+      /* Logged-in: swap nav sections */
+      navGuest.style.display = 'none';
+      navAuth.style.display  = 'flex';
+
+      /* Mobile: hide guest links, show auth links */
+      mobLogin.style.display     = 'none';
+      mobSignup.style.display    = 'none';
+      mobRequests.style.display  = 'block';
+      mobDashboard.style.display = 'block';
+      mobLogout.style.display    = 'block';
+
+      /* Avatar initials decoded from JWT payload */
+      try {
+        const payload  = JSON.parse(atob(token.split('.')[1]));
+        const name     = payload.name || payload.username || payload.email || '';
+        const initials = name.split(/[\s@]+/).slice(0, 2)
+                            .map(w => w[0]?.toUpperCase() || '').join('') || '?';
+        navAvatar.textContent = initials;
+        navAvatar.title       = name || 'My Account';
+      } catch (_) { /* keep '?' if token not decodeable */ }
+
+      /* Logout handlers */
+      logoutBtn.addEventListener('click', doLogout);
+      mobLogout.addEventListener('click', (e) => { e.preventDefault(); doLogout(); });
+
+      /* Fetch pending requests count (badge) — fire-and-forget */
+      fetch('/api/v1/owner/requests/?status=pending', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        const count = data?.count ?? data?.results?.length ?? null;
+        if (count && count > 0) {
+          reqCount.textContent    = count > 99 ? '99+' : count;
+          reqCount.style.display  = 'inline-flex';
+        }
+      })
+      .catch(() => {}); // silently ignore — badge is non-critical
+    }
+  })();
 </script>
 
 {% block extra_scripts %}{% endblock %}
