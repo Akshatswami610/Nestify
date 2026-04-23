@@ -302,6 +302,13 @@
 
   <!-- Auth actions (shown when logged in) -->
   <div class="nav-actions-auth" id="nav-auth" style="display:none;">
+
+    <a href="/owner-dashboard/" class="btn-nav-dashboard">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+      </svg>
+      Dashboard
+    </a>
     <a href="/owner-dashboard/requests/" class="btn-nav-requests" id="nav-requests-btn" title="Requests Received">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
@@ -309,13 +316,6 @@
       Requests
       <span class="requests-badge" id="nav-requests-count" style="display:none;">0</span>
     </a>
-    <a href="/owner-dashboard/" class="btn-nav-dashboard">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-      </svg>
-      Dashboard
-    </a>
-    <div class="nav-avatar" id="nav-avatar" title="My Account">?</div>
     <button class="btn-nav-logout" id="nav-logout-btn" title="Logout">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
