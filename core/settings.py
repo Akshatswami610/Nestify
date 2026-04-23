@@ -31,7 +31,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'accounts',
-    'bookings',
+    'requests',
     'dashboard',
     'listings',
 ]
