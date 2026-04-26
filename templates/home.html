@@ -479,31 +479,6 @@
   }
   .retry-btn:hover { background: var(--coral-d); transform: translateY(-1px); }
 
-  /* ── TRUST STRIP ── */
-  .trust-strip {
-    background: #fff;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 32px;
-  }
-  .trust-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 40px;
-    flex-wrap: wrap;
-  }
-  .trust-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: .82rem;
-    font-weight: 500;
-    color: var(--muted);
-  }
-  .trust-item span { font-size: 1rem; }
 
   @media (max-width: 600px) {
     .listings-section { padding: 40px 20px; }
@@ -511,8 +486,6 @@
     .search-bar { padding: 6px 6px 6px 16px; }
     .hero-stats { gap: 20px; }
     .stat-divider { display: none; }
-    .trust-strip { padding: 16px 20px; }
-    .trust-inner { gap: 20px; }
   }
 </style>
 {% endblock %}
@@ -525,7 +498,6 @@
   <div class="hero-content">
     <div class="hero-eyebrow">Verified PGs across India</div>
     <h1>Find your <em>perfect</em><br>PG, stress-free.</h1>
-    <p>Browse hundreds of verified paying-guest accommodations. Filter by city, budget, and facilities — and move in with confidence.</p>
 
     <div class="search-wrap">
       <div class="search-bar">
@@ -534,35 +506,9 @@
         <button id="searchBtn">Search</button>
       </div>
     </div>
-
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-num" id="statTotal">—</div>
-        <div class="stat-label">PGs Listed</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-num" id="statAvail">—</div>
-        <div class="stat-label">Available Now</div>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <div class="stat-num">100%</div>
-        <div class="stat-label">Verified</div>
-      </div>
-    </div>
   </div>
 </section>
 
-<!-- ── TRUST STRIP ── -->
-<div class="trust-strip">
-  <div class="trust-inner">
-    <div class="trust-item"><span>✅</span> Zero brokerage</div>
-    <div class="trust-item"><span>🔒</span> Verified listings</div>
-    <div class="trust-item"><span>⚡</span> Instant booking</div>
-    <div class="trust-item"><span>💬</span> Direct owner contact</div>
-  </div>
-</div>
 
 <!-- ── LISTINGS ── -->
 <section class="listings-section">
@@ -607,11 +553,6 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       allPGs = Array.isArray(data) ? data : (data.results || []);
-
-      // Update hero stats
-      const avail = allPGs.filter(p => p.is_available).length;
-      animateCount('statTotal', allPGs.length);
-      animateCount('statAvail', avail);
 
       renderPGs();
     } catch (err) {
