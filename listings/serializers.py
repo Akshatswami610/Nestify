@@ -22,7 +22,7 @@ class PGSerializer(serializers.ModelSerializer):
     class Meta:
         model = PG
         fields = [
-            'id',
+            'pg_id',
             'owner',
             'name',
             'description',
