@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from rest_framework import viewsets, permissions
+from rest_framework.exceptions import PermissionDenied
+from .models import Requests
+from .serializers import RequestsSerializer
 
-# Create your views here.
+class RequestsViewSet(viewsets.ModelViewSet):
+    serializer_class = RequestsSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = Requests.objects.all()
