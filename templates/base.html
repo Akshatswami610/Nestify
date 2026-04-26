@@ -260,37 +260,7 @@
     /* ── AUTH NAV ── */
     .nav-actions-auth { display: flex; align-items: center; gap: 10px; }
 
-    .btn-nav-requests {
-      text-decoration: none;
-      font-size: .875rem;
-      font-weight: 600;
-      color: var(--ink);
-      padding: 8px 16px;
-      border: 1.5px solid var(--border);
-      border-radius: 100px;
-      display: flex; align-items: center; gap: 6px;
-      transition: border-color .2s, background .2s, color .2s, transform .15s;
-      position: relative;
-    }
-    .btn-nav-requests:hover {
-      border-color: var(--coral);
-      background: #fff5f5;
-      color: var(--coral);
-      transform: translateY(-1px);
-    }
 
-    .requests-badge {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 18px; height: 18px;
-      background: var(--coral);
-      color: #fff;
-      font-size: .65rem;
-      font-weight: 700;
-      border-radius: 100px;
-      padding: 0 5px;
-      line-height: 1;
-      animation: badgePop .3s var(--ease);
-    }
     @keyframes badgePop {
       from { transform: scale(0); opacity: 0; }
       to   { transform: scale(1); opacity: 1; }
@@ -381,22 +351,24 @@
   </div>
 
   <!-- Auth actions -->
-  <div class="nav-actions-auth" id="nav-auth" style="display:none;">
-    <a href="/owner-dashboard/" class="btn-nav-dashboard">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
-      Dashboard
-    </a>
-    <a href="/owner-dashboard/requests/" class="btn-nav-requests" id="nav-requests-btn" title="Requests Received">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
-      Requests
-      <span class="requests-badge" id="nav-requests-count" style="display:none;">0</span>
-    </a>
-    <div class="nav-avatar" id="nav-avatar" title="My Account">?</div>
-    <button class="btn-nav-logout" id="nav-logout-btn" title="Logout">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg>
-      Logout
-    </button>
-  </div>
+<div class="nav-actions-auth" id="nav-auth" style="display:none;">
+
+  <a href="/owner-dashboard/" class="btn-nav-dashboard">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+    </svg>
+    Dashboard
+  </a>
+
+  <button class="btn-nav-logout" id="nav-logout-btn" title="Logout">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58
+               2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1
+               0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+    </svg>
+  </button>
+
+</div>
 
   <button class="nav-hamburger" id="hamburger" aria-label="Menu">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
@@ -409,7 +381,6 @@
   <a href="/about/">ℹ️ About</a>
   <a href="/login/" id="mob-login">🔑 Login</a>
   <a href="/signup/" class="mob-cta" id="mob-signup">Sign Up Free →</a>
-  <a href="/owner-dashboard/requests/" id="mob-requests" style="display:none;">📨 Requests Received</a>
   <a href="/owner-dashboard/" id="mob-dashboard" style="display:none;">📊 Dashboard</a>
   <a href="#" id="mob-logout" class="mob-cta" style="display:none;background:#ef4444;box-shadow:0 4px 16px rgba(239,68,68,.3);">Logout →</a>
 </div>
@@ -471,11 +442,11 @@
     const navAuth   = document.getElementById('nav-auth');
     const navAvatar = document.getElementById('nav-avatar');
     const logoutBtn = document.getElementById('nav-logout-btn');
-    const reqCount  = document.getElementById('nav-requests-count');
+
 
     const mobLogin     = document.getElementById('mob-login');
     const mobSignup    = document.getElementById('mob-signup');
-    const mobRequests  = document.getElementById('mob-requests');
+
     const mobDashboard = document.getElementById('mob-dashboard');
     const mobLogout    = document.getElementById('mob-logout');
 
@@ -491,7 +462,7 @@
 
       mobLogin.style.display     = 'none';
       mobSignup.style.display    = 'none';
-      mobRequests.style.display  = 'block';
+
       mobDashboard.style.display = 'block';
       mobLogout.style.display    = 'block';
 
@@ -507,19 +478,7 @@
       logoutBtn.addEventListener('click', doLogout);
       mobLogout.addEventListener('click', e => { e.preventDefault(); doLogout(); });
 
-      /* Requests badge */
-      fetch('/api/v1/owner/requests/?status=pending', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        const count = data?.count ?? data?.results?.length ?? null;
-        if (count && count > 0) {
-          reqCount.textContent   = count > 99 ? '99+' : count;
-          reqCount.style.display = 'inline-flex';
-        }
-      })
-      .catch(() => {});
+
     }
   })();
 </script>
