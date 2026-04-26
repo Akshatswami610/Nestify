@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import login, signup, logout, ownerdashboard, home, pg, about, contact
+from .views import login, signup, logout, ownerdashboard, home, pg, about, contact, requests, profile
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,6 +23,8 @@ urlpatterns = [
     path('pg/<int:id>/', pg, name='pg_detail'),
     path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
+    path('owner-dashboard/requests/', requests, name='requests'),
+    path('owner-dashboard/profile/', profile, name='profile'),
 ]
 
 # Serve media files
