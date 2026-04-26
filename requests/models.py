@@ -6,7 +6,7 @@ User = settings.AUTH_USER_MODEL
 class Requests(models.Model):
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=10)
-
+    pg_id = models.CharField(max_length=100, default='')
     date = models.DateField()
     time = models.TimeField()
 
