@@ -5,6 +5,7 @@ User = settings.AUTH_USER_MODEL
 
 
 class PG(models.Model):
+    pg_id = models.AutoField(primary_key=True)
     owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
