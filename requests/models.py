@@ -9,7 +9,7 @@ class Requests(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('accepted', 'Accepted'), ]
-    pg = models.ForeignKey(PG, on_delete=models.CASCADE, related_name='requests')
+    pg = models.ForeignKey( PG, on_delete=models.CASCADE, related_name='requests', null=True, blank=True )
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=10)
     visit_date = models.DateField()
