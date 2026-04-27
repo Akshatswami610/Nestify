@@ -23,9 +23,3 @@ def contact(request):
 
 def pg(request, id=None):
     return render(request, 'pg.html')
-
-def requests(request):
-    return render(request, 'requests.html')
-
-def profile(request):
-    return render(request, 'profile.html')
