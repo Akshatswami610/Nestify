@@ -72,43 +72,103 @@
     transform: translateY(-1px);
   }
 
-  /* ── STATS ROW ── */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 16px;
+  /* ── PROFILE CARD ── */
+  .profile-section {
     margin-bottom: 36px;
   }
 
-  .stat-card {
+  .profile-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 22px 20px;
-    display: flex; flex-direction: column; gap: 6px;
-    transition: box-shadow .2s, transform .2s;
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow .2s;
   }
-  .stat-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,.07); transform: translateY(-2px); }
-  .stat-icon {
-    width: 38px; height: 38px;
-    background: var(--coral-l);
-    border-radius: 10px;
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--coral), #ff9a6c);
+    border-radius: 20px 20px 0 0;
+  }
+  .profile-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.08); }
+
+  .profile-avatar-big {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--coral), #ff9a6c);
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    margin-bottom: 4px;
-  }
-  .stat-icon svg { fill: var(--coral); }
-  .stat-val {
     font-family: 'Fraunces', serif;
-    font-size: 2rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(255,90,95,.3);
+  }
+
+  .profile-info { flex: 1; min-width: 0; }
+  .profile-name {
+    font-family: 'Fraunces', serif;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--ink);
-    line-height: 1;
+    letter-spacing: -.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .stat-label {
-    font-size: .78rem;
+  .profile-company {
+    font-size: .82rem;
+    color: var(--coral);
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 14px;
+  }
+  .profile-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .82rem;
     color: var(--muted);
-    font-weight: 500;
   }
+  .profile-meta-item svg { fill: var(--coral); flex-shrink: 0; opacity: .8; }
+  .profile-meta-item strong { color: var(--ink); font-weight: 500; }
+
+  .profile-edit-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s, transform .15s;
+    align-self: flex-start;
+    flex-shrink: 0;
+  }
+  .profile-edit-btn:hover {
+    border-color: var(--coral);
+    color: var(--coral);
+    background: var(--coral-l);
+    transform: translateY(-1px);
+  }
+  .profile-edit-btn svg { fill: currentColor; }
 
   /* ── LISTINGS TABLE ── */
   .section-head {
@@ -151,11 +211,29 @@
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: #fafafa; }
   tbody td {
-    padding: 16px 20px;
+    padding: 14px 20px;
     font-size: .875rem;
     color: var(--ink);
     vertical-align: middle;
   }
+
+  .pg-thumb-cell { width: 64px; }
+  .pg-thumb {
+    width: 56px; height: 56px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1.5px solid var(--border);
+    background: #f3f4f6;
+    display: block;
+  }
+  .pg-thumb-placeholder {
+    width: 56px; height: 56px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px dashed var(--border);
+  }
+  .pg-thumb-placeholder svg { fill: #d1d5db; }
 
   .pg-name-cell { font-weight: 600; }
   .pg-city { font-size: .78rem; color: var(--muted); margin-top: 2px; }
@@ -180,6 +258,27 @@
     border-radius: 100px;
   }
   .chip.active { background: var(--coral-l); color: var(--coral); }
+
+  .btn-edit-listing {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--muted);
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
+    white-space: nowrap;
+  }
+  .btn-edit-listing:hover {
+    border-color: var(--coral);
+    color: var(--coral);
+    background: var(--coral-l);
+  }
+  .btn-edit-listing svg { fill: currentColor; }
 
   .empty-state {
     padding: 60px 20px;
@@ -224,10 +323,9 @@
 
   .modal-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 24px 28px 0;
+    padding: 24px 28px 20px;
     position: sticky; top: 0; background: var(--card);
     z-index: 2;
-    padding-bottom: 20px;
     border-bottom: 1px solid var(--border);
   }
   .modal-title {
@@ -236,6 +334,7 @@
     font-weight: 600;
     color: var(--ink);
   }
+
   .modal-close {
     background: #f3f4f6;
     border: none; cursor: pointer;
@@ -283,7 +382,19 @@
     box-shadow: 0 0 0 3px rgba(255,90,95,.12);
     background: #fff;
   }
+  .field input:disabled {
+    background: #f3f4f6;
+    color: var(--muted);
+    cursor: not-allowed;
+    border-color: #e5e7eb;
+  }
   .field textarea { resize: vertical; min-height: 90px; }
+
+  .field-hint {
+    font-size: .72rem;
+    color: var(--muted);
+    margin-top: -2px;
+  }
 
   /* Checkboxes grid */
   .checkbox-group {
@@ -374,11 +485,7 @@
   .request-card:hover { border-color: #d1d5db; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
 
   .req-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .req-name {
-    font-weight: 600;
-    font-size: .95rem;
-    color: var(--ink);
-  }
+  .req-name { font-weight: 600; font-size: .95rem; color: var(--ink); }
   .req-phone { font-size: .8rem; color: var(--muted); margin-top: 3px; }
   .req-pg { font-size: .82rem; color: var(--muted); margin-top: 2px; }
 
@@ -460,12 +567,34 @@
   }
   .loading-row .spinner { border-color: var(--border); border-top-color: var(--coral); }
 
+  /* ── EDIT LISTING MODAL image row ── */
+  .existing-imgs-row {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
+  }
+  .existing-img-wrap {
+    position: relative;
+  }
+  .existing-img-wrap img {
+    width: 64px; height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1.5px solid var(--border);
+    display: block;
+  }
+
   /* Responsive */
+  @media (max-width: 768px) {
+    .profile-card { flex-direction: column; align-items: flex-start; }
+    .profile-edit-btn { align-self: flex-start; }
+    thead th:nth-child(4), tbody td:nth-child(4),
+    thead th:nth-child(5), tbody td:nth-child(5) { display: none; }
+  }
   @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
     .form-grid .full { grid-column: 1; }
     .modal-header, .modal-body { padding-left: 20px; padding-right: 20px; }
     .dash-title { font-size: 1.5rem; }
+    thead th:nth-child(3), tbody td:nth-child(3) { display: none; }
   }
 </style>
 {% endblock %}
@@ -478,7 +607,7 @@
     <h1 class="dash-title">Your <span>Dashboard</span></h1>
     <div class="dash-actions">
       <button class="btn-ghost" id="openRequestsBtn">
-        <svg width="15" height="15" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
         Requests
         <span class="badge badge-pending" id="requests-count-badge" style="display:none;">0</span>
       </button>
@@ -489,22 +618,28 @@
     </div>
   </div>
 
-  <!-- Stats -->
-  <div class="stats-row" id="statsRow">
-    <div class="stat-card">
-      <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
-      <div class="stat-val" id="stat-total">—</div>
-      <div class="stat-label">Total Listings</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg></div>
-      <div class="stat-val" id="stat-available">—</div>
-      <div class="stat-label">Available</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></div>
-      <div class="stat-val" id="stat-requests">—</div>
-      <div class="stat-label">Pending Requests</div>
+  <!-- Profile Card -->
+  <div class="profile-section">
+    <div class="profile-card" id="profileCard">
+      <div class="profile-avatar-big" id="profileAvatar">?</div>
+      <div class="profile-info">
+        <div class="profile-name" id="profileName">Loading…</div>
+        <div class="profile-company" id="profileCompany"></div>
+        <div class="profile-meta">
+          <div class="profile-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <strong id="profileEmail">—</strong>
+          </div>
+          <div class="profile-meta-item">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+            <strong id="profilePhone">—</strong>
+          </div>
+        </div>
+      </div>
+      <button class="profile-edit-btn" id="openEditProfileBtn">
+        <svg width="13" height="13" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        Edit Profile
+      </button>
     </div>
   </div>
 
@@ -517,6 +652,44 @@
       <div class="loading-row">
         <span class="spinner"></span>
         Loading your listings…
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── EDIT PROFILE MODAL ───────────────── -->
+<div class="modal-backdrop" id="editProfileModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Profile</h2>
+      <button class="modal-close" data-close="editProfileModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="grid-template-columns:1fr;">
+        <div class="field">
+          <label>Full Name</label>
+          <input type="text" id="editName" placeholder="Your full name" />
+        </div>
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="editEmail" disabled />
+          <span class="field-hint">Email cannot be changed.</span>
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="editPhone" placeholder="+91 98765 43210" />
+        </div>
+        <div class="field">
+          <label>Company Name</label>
+          <input type="text" id="editCompany" placeholder="Your company / brand name" />
+        </div>
+      </div>
+      <div class="form-footer">
+        <button type="button" class="btn-ghost" data-close="editProfileModal">Cancel</button>
+        <button type="button" class="btn-primary" id="saveProfileBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+          Save Changes
+        </button>
       </div>
     </div>
   </div>
@@ -617,6 +790,105 @@
   </div>
 </div>
 
+<!-- ───────────────── EDIT LISTING MODAL ───────────────── -->
+<div class="modal-backdrop" id="editListingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Listing</h2>
+      <button class="modal-close" data-close="editListingModal">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editListingId" />
+      <form id="editListingForm" enctype="multipart/form-data" autocomplete="off">
+
+        <div class="form-section-label">Basic Info</div>
+        <div class="form-grid">
+          <div class="field full">
+            <label>PG Name *</label>
+            <input type="text" name="name" id="el-name" placeholder="e.g. Sunrise PG for Girls" required />
+          </div>
+          <div class="field full">
+            <label>Description *</label>
+            <textarea name="description" id="el-description" placeholder="Describe your PG…" required></textarea>
+          </div>
+        </div>
+
+        <div class="form-section-label">Location</div>
+        <div class="form-grid">
+          <div class="field full">
+            <label>Full Address *</label>
+            <input type="text" name="location" id="el-location" required />
+          </div>
+          <div class="field">
+            <label>City *</label>
+            <input type="text" name="city" id="el-city" required />
+          </div>
+          <div class="field">
+            <label>Gender Preference *</label>
+            <select name="gender_preference" id="el-gender" required>
+              <option value="any">Any</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section-label">Pricing</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Monthly Rent (₹) *</label>
+            <input type="number" name="rent" id="el-rent" min="0" required />
+          </div>
+          <div class="field">
+            <label>Security Deposit (₹)</label>
+            <input type="number" name="deposit" id="el-deposit" min="0" />
+          </div>
+          <div class="field">
+            <label>Booking Fees (₹)</label>
+            <input type="number" name="booking_fees" id="el-booking_fees" min="0" />
+          </div>
+          <div class="field">
+            <label>Availability</label>
+            <select name="is_available" id="el-is_available">
+              <option value="true">Available</option>
+              <option value="false">Not Available</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-section-label">Facilities</div>
+        <div class="checkbox-group">
+          <label class="checkbox-item"><input type="checkbox" name="wifi" id="el-wifi" value="true" /><span>📶 WiFi</span></label>
+          <label class="checkbox-item"><input type="checkbox" name="food" id="el-food" value="true" /><span>🍱 Food</span></label>
+          <label class="checkbox-item"><input type="checkbox" name="laundry" id="el-laundry" value="true" /><span>🧺 Laundry</span></label>
+          <label class="checkbox-item"><input type="checkbox" name="ac" id="el-ac" value="true" /><span>❄️ AC</span></label>
+          <label class="checkbox-item"><input type="checkbox" name="parking" id="el-parking" value="true" /><span>🅿️ Parking</span></label>
+        </div>
+
+        <div class="form-section-label">Current Photos</div>
+        <div class="existing-imgs-row" id="existingImgsRow"></div>
+
+        <div class="form-section-label">Add More Photos</div>
+        <div class="upload-zone" id="editUploadZone">
+          <input type="file" name="images" id="editImageInput" accept="image/*" multiple />
+          <svg width="28" height="28" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <p>Drag &amp; drop images here or <strong>browse</strong></p>
+          <p style="font-size:.75rem;margin-top:4px;">PNG, JPG up to 5 MB each</p>
+        </div>
+        <div class="img-preview-row" id="editImgPreviewRow"></div>
+
+        <div class="form-footer">
+          <button type="button" class="btn-ghost" data-close="editListingModal">Cancel</button>
+          <button type="submit" class="btn-primary" id="submitEditListBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- ───────────────── REQUESTS MODAL ───────────────── -->
 <div class="modal-backdrop" id="requestsModal">
   <div class="modal requests-modal">
@@ -642,7 +914,7 @@
 <script>
 const API_BASE = '/api/v1';
 const token = () => localStorage.getItem('nestify_token');
-const headers = () => ({ 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' });
+const headers = () => ({ 'Authorization': `Token ${token()}`, 'Content-Type': 'application/json' });
 
 /* ── TOAST ── */
 function showToast(msg, duration = 3000) {
@@ -669,8 +941,9 @@ document.getElementById('openRequestsBtn').addEventListener('click', () => {
   openModal('requestsModal');
   loadRequests();
 });
+document.getElementById('openEditProfileBtn').addEventListener('click', () => openEditProfileModal());
 
-/* ── IMAGE PREVIEW ── */
+/* ── IMAGE PREVIEW (new listing) ── */
 document.getElementById('imageInput').addEventListener('change', function() {
   const row = document.getElementById('imgPreviewRow');
   row.innerHTML = '';
@@ -686,17 +959,105 @@ uz.addEventListener('dragover', e => { e.preventDefault(); uz.classList.add('dra
 uz.addEventListener('dragleave', () => uz.classList.remove('drag'));
 uz.addEventListener('drop', e => { e.preventDefault(); uz.classList.remove('drag'); document.getElementById('imageInput').files = e.dataTransfer.files; document.getElementById('imageInput').dispatchEvent(new Event('change')); });
 
+/* ── IMAGE PREVIEW (edit listing) ── */
+document.getElementById('editImageInput').addEventListener('change', function() {
+  const row = document.getElementById('editImgPreviewRow');
+  row.innerHTML = '';
+  Array.from(this.files).forEach(file => {
+    const img = document.createElement('img');
+    img.className = 'img-thumb';
+    img.src = URL.createObjectURL(file);
+    row.appendChild(img);
+  });
+});
+const euz = document.getElementById('editUploadZone');
+euz.addEventListener('dragover', e => { e.preventDefault(); euz.classList.add('drag'); });
+euz.addEventListener('dragleave', () => euz.classList.remove('drag'));
+euz.addEventListener('drop', e => { e.preventDefault(); euz.classList.remove('drag'); document.getElementById('editImageInput').files = e.dataTransfer.files; document.getElementById('editImageInput').dispatchEvent(new Event('change')); });
+
+/* ── PROFILE ── */
+let currentProfile = {};
+
+async function loadProfile() {
+  try {
+    const res = await fetch(`${API_BASE}/accounts/me/`, { headers: { 'Authorization': `Token ${token()}` } });
+    if (!res.ok) throw new Error();
+    const u = await res.json();
+    currentProfile = u;
+    renderProfile(u);
+  } catch {
+    // Fallback: decode token for basic info
+    try {
+      const payload = JSON.parse(atob(token().split('.')[1]));
+      const fallback = { username: payload.username || payload.name || '', email: payload.email || '', phone_number: '', company_name: '' };
+      currentProfile = fallback;
+      renderProfile(fallback);
+    } catch { /* silent */ }
+  }
+}
+
+function renderProfile(u) {
+  const name = u.username || u.name || u.email || 'Owner';
+  const initials = name.split(/[\s@]+/).slice(0,2).map(w => w[0]?.toUpperCase() || '').join('') || '?';
+
+  document.getElementById('profileAvatar').textContent = initials;
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileEmail').textContent = u.email || '—';
+  document.getElementById('profilePhone').textContent = u.phone_number || '—';
+
+  const company = u.company_name || '';
+  const companyEl = document.getElementById('profileCompany');
+  if (company) { companyEl.textContent = '🏢 ' + company; companyEl.style.display = ''; }
+  else { companyEl.style.display = 'none'; }
+}
+
+function openEditProfileModal() {
+  const u = currentProfile;
+  document.getElementById('editName').value    = u.username || u.name || '';
+  document.getElementById('editEmail').value   = u.email || '';
+  document.getElementById('editPhone').value   = u.phone_number || '';
+  document.getElementById('editCompany').value = u.company_name || '';
+  openModal('editProfileModal');
+}
+
+document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveProfileBtn');
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
+  btn.disabled = true;
+
+  const payload = {
+    username: document.getElementById('editName').value.trim(),
+    phone_number: document.getElementById('editPhone').value.trim(),
+    company_name: document.getElementById('editCompany').value.trim(),
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/accounts/me/`, {
+      method: 'PATCH',
+      headers: headers(),
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error();
+    const updated = await res.json();
+    currentProfile = { ...currentProfile, ...updated };
+    renderProfile(currentProfile);
+    closeModal('editProfileModal');
+    showToast('✅ Profile updated successfully!');
+  } catch {
+    showToast('❌ Failed to update profile. Please try again.');
+  } finally {
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg> Save Changes';
+    btn.disabled = false;
+  }
+});
+
 /* ── LOAD LISTINGS ── */
 async function loadListings() {
   const body = document.getElementById('listingsBody');
   try {
-    const res = await fetch(`${API_BASE}/listings/`, { headers: { 'Authorization': `Bearer ${token()}` } });
+    const res = await fetch(`${API_BASE}/listings/`, { headers: { 'Authorization': `Token ${token()}` } });
     const data = await res.json();
     const listings = Array.isArray(data) ? data : (data.results || []);
-
-    // update stats
-    document.getElementById('stat-total').textContent = listings.length;
-    document.getElementById('stat-available').textContent = listings.filter(l => l.is_available).length;
 
     if (!listings.length) {
       body.innerHTML = `<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><p>No listings yet. Click <strong>List a PG</strong> to get started!</p></div>`;
@@ -707,19 +1068,28 @@ async function loadListings() {
       <table>
         <thead>
           <tr>
+            <th style="width:70px;">Photo</th>
             <th>PG Name</th>
             <th>City</th>
             <th>Rent</th>
             <th>Facilities</th>
-            <th>Gender</th>
             <th>Status</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          ${listings.map(pg => `
+          ${listings.map(pg => {
+            // Support images as array of objects {image: url} or array of strings
+            const imgs = pg.images || [];
+            const firstImg = imgs.length ? (imgs[0].image || imgs[0]) : null;
+            const thumbHtml = firstImg
+              ? `<img class="pg-thumb" src="${firstImg}" alt="${pg.name}" loading="lazy" />`
+              : `<div class="pg-thumb-placeholder"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg></div>`;
+            return `
             <tr>
-              <td class="pg-name-cell">${pg.name}</td>
-              <td><div>${pg.city}</div><div class="pg-city">${pg.location}</div></td>
+              <td class="pg-thumb-cell">${thumbHtml}</td>
+              <td class="pg-name-cell">${pg.name}<div class="pg-city">${pg.location || ''}</div></td>
+              <td>${pg.city}</td>
               <td>₹${Number(pg.rent).toLocaleString('en-IN')}<br><small style="color:var(--muted);font-size:.72rem">+₹${pg.deposit || 0} dep.</small></td>
               <td>
                 <div class="facility-chips">
@@ -730,10 +1100,15 @@ async function loadListings() {
                   <span class="chip ${pg.parking?'active':''}">Parking</span>
                 </div>
               </td>
-              <td style="text-transform:capitalize">${pg.gender_preference}</td>
               <td><span class="badge ${pg.is_available?'badge-green':'badge-red'}">${pg.is_available?'Available':'Occupied'}</span></td>
-            </tr>
-          `).join('')}
+              <td>
+                <button class="btn-edit-listing" onclick="openEditListing(${pg.id})">
+                  <svg width="12" height="12" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                  Edit
+                </button>
+              </td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>`;
   } catch(err) {
@@ -741,19 +1116,110 @@ async function loadListings() {
   }
 }
 
+/* ── OPEN EDIT LISTING ── */
+async function openEditListing(id) {
+  try {
+    const res = await fetch(`${API_BASE}/listings/${id}/`, { headers: { 'Authorization': `Token ${token()}` } });
+    if (!res.ok) throw new Error();
+    const pg = await res.json();
+
+    document.getElementById('editListingId').value      = pg.id;
+    document.getElementById('el-name').value            = pg.name || '';
+    document.getElementById('el-description').value     = pg.description || '';
+    document.getElementById('el-location').value        = pg.location || '';
+    document.getElementById('el-city').value            = pg.city || '';
+    document.getElementById('el-gender').value          = pg.gender_preference || 'any';
+    document.getElementById('el-rent').value            = pg.rent || '';
+    document.getElementById('el-deposit').value         = pg.deposit || '';
+    document.getElementById('el-booking_fees').value    = pg.booking_fees || '';
+    document.getElementById('el-is_available').value    = pg.is_available ? 'true' : 'false';
+    document.getElementById('el-wifi').checked          = !!pg.wifi;
+    document.getElementById('el-food').checked          = !!pg.food;
+    document.getElementById('el-laundry').checked       = !!pg.laundry;
+    document.getElementById('el-ac').checked            = !!pg.ac;
+    document.getElementById('el-parking').checked       = !!pg.parking;
+
+    // Show existing images
+    const imgs = pg.images || [];
+    const row = document.getElementById('existingImgsRow');
+    row.innerHTML = '';
+    if (imgs.length) {
+      imgs.forEach(img => {
+        const src = img.image || img;
+        const wrap = document.createElement('div');
+        wrap.className = 'existing-img-wrap';
+        wrap.innerHTML = `<img src="${src}" alt="PG photo" />`;
+        row.appendChild(wrap);
+      });
+    } else {
+      row.innerHTML = `<span style="font-size:.8rem;color:var(--muted);">No photos uploaded yet.</span>`;
+    }
+
+    // Clear new upload preview
+    document.getElementById('editImgPreviewRow').innerHTML = '';
+    document.getElementById('editImageInput').value = '';
+
+    openModal('editListingModal');
+  } catch {
+    showToast('❌ Could not load listing details.');
+  }
+}
+
+/* ── SUBMIT EDIT LISTING ── */
+document.getElementById('editListingForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitEditListBtn');
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
+  btn.disabled = true;
+
+  const id = document.getElementById('editListingId').value;
+  try {
+    const fd = new FormData(this);
+    ['wifi','food','laundry','ac','parking'].forEach(f => {
+      if (!fd.has(f)) fd.set(f, 'false');
+    });
+    fd.set('is_available', fd.get('is_available') === 'true' ? 'true' : 'false');
+
+    // Remove empty image field if no file selected
+    const editImgInput = document.getElementById('editImageInput');
+    if (!editImgInput.files.length) fd.delete('images');
+
+    const res = await fetch(`${API_BASE}/listings/${id}/`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Token ${token()}` },
+      body: fd
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(JSON.stringify(err));
+    }
+
+    showToast('✅ Listing updated successfully!');
+    closeModal('editListingModal');
+    loadListings();
+  } catch(err) {
+    showToast('❌ Failed to update listing. Please check your details.');
+    console.error(err);
+  } finally {
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg> Save Changes';
+    btn.disabled = false;
+  }
+});
+
 /* ── LOAD REQUESTS ── */
 async function loadRequests() {
   const body = document.getElementById('requestsBody');
   body.innerHTML = `<div class="loading-row"><span class="spinner"></span>Loading requests…</div>`;
   try {
-    const res = await fetch(`${API_BASE}/requests/`, { headers: { 'Authorization': `Bearer ${token()}` } });
+    const res = await fetch(`${API_BASE}/requests/`, { headers: { 'Authorization': `Token ${token()}` } });
     const data = await res.json();
     const reqs = Array.isArray(data) ? data : (data.results || []);
 
     const pending = reqs.filter(r => r.status === 'pending').length;
-    document.getElementById('stat-requests').textContent = pending;
     const badge = document.getElementById('requests-count-badge');
     if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline-block'; }
+    else { badge.style.display = 'none'; }
 
     if (!reqs.length) {
       body.innerHTML = `<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg><p>No visit requests yet.</p></div>`;
@@ -778,8 +1244,8 @@ async function loadRequests() {
           </div>
         </div>
         <div class="req-meta">
-          <span class="req-meta-item"><svg width="12" height="12" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>${r.visit_date}</span>
-          <span class="req-meta-item"><svg width="12" height="12" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>${r.visit_time}</span>
+          <span class="req-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>${r.visit_date}</span>
+          <span class="req-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>${r.visit_time}</span>
           <span class="req-meta-item" style="font-size:.72rem;color:#9ca3af;">Received: ${new Date(r.timestamp).toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'})}</span>
         </div>
       </div>
@@ -804,7 +1270,6 @@ async function updateStatus(id) {
     badge.textContent = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
     badge.className = `badge badge-${newStatus}`;
     showToast(`✅ Request status updated to "${newStatus}"`);
-    // refresh pending count
     loadRequests();
   } catch(e) {
     showToast('❌ Failed to update status. Try again.');
@@ -820,16 +1285,14 @@ document.getElementById('listPGForm').addEventListener('submit', async function(
 
   try {
     const fd = new FormData(this);
-    // Coerce checkboxes – unchecked fields won't be in FormData, set them false
     ['wifi','food','laundry','ac','parking'].forEach(f => {
       if (!fd.has(f)) fd.set(f, 'false');
     });
-    // is_available string to bool
     fd.set('is_available', fd.get('is_available') === 'true' ? 'true' : 'false');
 
     const res = await fetch(`${API_BASE}/listings/`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${token()}` },
+      headers: { 'Authorization': `Token ${token()}` },
       body: fd
     });
 
@@ -855,14 +1318,14 @@ document.getElementById('listPGForm').addEventListener('submit', async function(
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded', () => {
   if (token()) {
+    loadProfile();
     loadListings();
     // silently pre-fetch requests for badge count
-    fetch(`${API_BASE}/requests/`, { headers: { 'Authorization': `Bearer ${token()}` } })
+    fetch(`${API_BASE}/requests/`, { headers: { 'Authorization': `Token ${token()}` } })
       .then(r => r.json())
       .then(data => {
         const reqs = Array.isArray(data) ? data : (data.results || []);
         const pending = reqs.filter(r => r.status === 'pending').length;
-        document.getElementById('stat-requests').textContent = pending;
         const badge = document.getElementById('requests-count-badge');
         if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline-block'; }
       }).catch(() => {});
