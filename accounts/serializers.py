@@ -28,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         email = validated_data['email']
 
         user = User.objects.create_user(
-            username=email,  # ✅ use email as username internally
+            username=email,
             email=email,
             phone_number=validated_data['phone_number'],
             company_name=validated_data['company_name'],
