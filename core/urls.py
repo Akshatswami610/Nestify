@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from .views import login, signup, logout, ownerdashboard, home, pg, about, contact, requests, profile
+from .views import login, signup, logout, ownerdashboard, home, pg, about, contact
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -12,7 +12,6 @@ urlpatterns = [
     path('api/v1/accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('api/v1/listings/', include('listings.urls')),
     path('api/v1/requests/', include('requests.urls')),
-    #path('api/v1/dashboard/', include('dashboard.urls')),
 
     # Frontend pages
     path('', home, name='home'),
@@ -23,8 +22,6 @@ urlpatterns = [
     path('pg/<int:id>/', pg, name='pg_detail'),
     path('about/', about, name='about'),
     path('contact/', contact, name='contact'),
-    path('owner-dashboard/requests/', requests, name='requests'),
-    path('owner-dashboard/profile/', profile, name='profile'),
 ]
 
 # Serve media files
