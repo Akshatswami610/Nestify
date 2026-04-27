@@ -10,9 +10,16 @@ class PGViewSet(viewsets.ModelViewSet):
 
     # 🔍 Get all PGs + filtering
     def get_queryset(self):
-        queryset = PG.objects.all().order_by('-created_at')
+        user = self.request.user
 
-        # Filters
+        # If user is authenticated → only their listings
+        if user.is_authenticated:
+            queryset = PG.objects.filter(owner=user).order_by('-created_at')
+        else:
+            # Public users → see all available PGs
+            queryset = PG.objects.filter(is_available=True).order_by('-created_at')
+
+        # 🔍 Filters (keep your existing filters)
         city = self.request.query_params.get('city')
         max_rent = self.request.query_params.get('max_rent')
         wifi = self.request.query_params.get('wifi')
@@ -25,11 +32,11 @@ class PGViewSet(viewsets.ModelViewSet):
         if max_rent:
             queryset = queryset.filter(rent__lte=max_rent)
 
-        if wifi:
-            queryset = queryset.filter(wifi=True)
+        if wifi is not None:
+            queryset = queryset.filter(wifi=wifi.lower() == 'true')
 
-        if food:
-            queryset = queryset.filter(food=True)
+        if food is not None:
+            queryset = queryset.filter(food=food.lower() == 'true')
 
         if gender:
             queryset = queryset.filter(gender_preference=gender)
