@@ -3,8 +3,8 @@ from .models import PG, PGImage
 # Register your models here.
 @admin.register(PG)
 class PGAdmin(admin.ModelAdmin):
-    list_display = ('pg_id', 'name', 'description')
-    search_fields = ('name', 'description')
+    list_display = ('pg_id', 'name', 'owner')
+    search_fields = ('name', 'owner')
 
 @admin.register(PGImage)
 class PGImageAdmin(admin.ModelAdmin):
