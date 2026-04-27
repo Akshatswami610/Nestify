@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     # Local apps
     'accounts',
     'requests',
-    'dashboard',
     'listings',
 ]
 
