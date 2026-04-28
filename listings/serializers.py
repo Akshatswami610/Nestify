@@ -1,12 +1,10 @@
 from rest_framework import serializers
 from .models import PG, PGImage
 
-
 class PGImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PGImage
         fields = ['id', 'image']
-
 
 class PGSerializer(serializers.ModelSerializer):
     images = PGImageSerializer(many=True, read_only=True)
