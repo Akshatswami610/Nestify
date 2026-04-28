@@ -4,6 +4,6 @@ from .views import RequestsViewSet
 app_name = 'requests'
 
 router = DefaultRouter()
-router.register(r'requests', RequestsViewSet, basename='requests')
+router.register(r'', RequestsViewSet, basename='requests')
 
 urlpatterns = router.urls
