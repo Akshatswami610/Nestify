@@ -789,9 +789,8 @@
 
   const pgId     = getPgId();
   const API_BASE = '/api/v1/listings/';
-  let   pgOwnerId    = null; // numeric owner id
-  let   pgNameCache   = '';   // for modal subtitles
-  let   pgCompanyCache = '';   // for contact modal
+  let pgNameCache  = '';  // for book modal subtitle
+  let pgOwnerCache = {};  // stores pg.owner object from API
 
   // ── Load PG ──
   async function loadPG() {
@@ -819,13 +818,9 @@
     document.getElementById('pageLoading').style.display = 'none';
     document.getElementById('pageContent').style.display = 'block';
 
-    // Store owner id only if it is a real numeric id.
-    // If the API returns a name string (e.g. "Rohit Cares") we discard it
-    // to avoid building broken URLs like /accounts/Rohit%20Cares/
-    const rawOwner = pg.owner ?? pg.owner_id ?? null;
-    pgOwnerId    = (rawOwner !== null && /^\d+$/.test(String(rawOwner))) ? rawOwner : null;
-    pgNameCache  = pg.name || '';
-    pgCompanyCache = pg.company_name || pg.owner_company || '';
+    // Cache owner object and pg name for modals
+    pgOwnerCache = pg.owner || {};
+    pgNameCache  = pg.name  || '';
 
     // Meta
     document.getElementById('breadcrumbName').textContent = pg.name;
@@ -866,18 +861,18 @@
     document.getElementById('detailGender').textContent = genderMap[pg.gender_preference] || pg.gender_preference;
     document.getElementById('detailStatus').textContent = pg.is_available ? '✅ Available now' : '❌ Fully booked';
 
-    // Managed by — show company_name if present
-    const companyName = pg.company_name || pg.owner_company || null;
-    if (companyName) {
-      document.getElementById('companyName').textContent = companyName;
+    // Managed by — show owner username if present
+    const ownerName = pg.owner?.username || null;
+    if (ownerName) {
+      document.getElementById('companyName').textContent = ownerName;
       document.getElementById('managedBy').style.display = 'flex';
     }
 
     // Book button
     const bookBtn = document.getElementById('bookBtn');
     if (!pg.is_available) {
-      bookBtn.disabled     = true;
-      bookBtn.textContent  = 'Currently Full';
+      bookBtn.disabled    = true;
+      bookBtn.textContent = 'Currently Full';
     }
 
     // Gallery
@@ -892,9 +887,9 @@
       if (pg.images.length > 1) {
         const thumbsEl = document.getElementById('galleryThumbs');
         pg.images.forEach((imgObj, i) => {
-          const thumb       = document.createElement('div');
-          thumb.className   = `thumb ${i === 0 ? 'active' : ''}`;
-          thumb.innerHTML   = `<img src="${esc(imgObj.image)}" alt="Photo ${i + 1}" loading="lazy">`;
+          const thumb     = document.createElement('div');
+          thumb.className = `thumb ${i === 0 ? 'active' : ''}`;
+          thumb.innerHTML = `<img src="${esc(imgObj.image)}" alt="Photo ${i + 1}" loading="lazy">`;
           thumb.addEventListener('click', () => {
             mainImg.classList.add('changing');
             setTimeout(() => {
@@ -932,7 +927,6 @@
     const m = document.getElementById(id);
     m.classList.add('open');
     document.body.style.overflow = 'hidden';
-    // Focus first focusable element
     setTimeout(() => {
       const el = m.querySelector('input, button:not(.modal-close)');
       if (el) el.focus();
@@ -973,10 +967,8 @@
       setTimeout(() => { window.location.href = `/login/?next=/pg/${pgId}/`; }, 1500);
       return;
     }
-    // Set minimum date to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('visitDate').min = today;
-    // Update subtitle with PG name
     if (pgNameCache) {
       document.querySelector('#bookModal .modal-subtitle').textContent =
         `Schedule a visit to ${pgNameCache}. We'll notify the owner right away.`;
@@ -998,10 +990,10 @@
 
     let valid = true;
 
-    setError('fg-name',  !name);                                       if (!name)  valid = false;
-    setError('fg-phone', !/^\d{10}$/.test(phone));                     if (!/^\d{10}$/.test(phone)) valid = false;
-    setError('fg-date',  !date || date < today);                       if (!date || date < today) valid = false;
-    setError('fg-time',  !time);                                       if (!time) valid = false;
+    setError('fg-name',  !name);                          if (!name)  valid = false;
+    setError('fg-phone', !/^\d{10}$/.test(phone));        if (!/^\d{10}$/.test(phone)) valid = false;
+    setError('fg-date',  !date || date < today);          if (!date || date < today) valid = false;
+    setError('fg-time',  !time);                          if (!time) valid = false;
 
     return valid;
   }
@@ -1037,7 +1029,6 @@
       if (res.ok) {
         closeModal('bookModal');
         showToast('✅ Visit booked! The owner will confirm soon.', 'success');
-        // Reset form
         ['visitName','visitPhone','visitDate','visitTime'].forEach(id => {
           document.getElementById(id).value = '';
         });
@@ -1064,9 +1055,9 @@
 
 
   // ══════════════════════════════════════
-  //  CONTACT OWNER — open modal + fetch
+  //  CONTACT OWNER — no API call, use cached pg.owner
   // ══════════════════════════════════════
-  document.getElementById('contactBtn').addEventListener('click', async () => {
+  document.getElementById('contactBtn').addEventListener('click', () => {
     const token = localStorage.getItem('nestify_token');
     if (!token) {
       showToast('Please log in to contact the owner.', 'error');
@@ -1074,96 +1065,53 @@
       return;
     }
 
-    // Reset modal state
-    document.getElementById('contactLoading').style.display = 'block';
-    document.getElementById('contactInfo').style.display    = 'none';
-    document.getElementById('contactInfo').innerHTML        = '';
-    // Update subtitle
-    if (pgCompanyCache) {
-      document.querySelector('#contactModal .modal-subtitle').textContent =
-        `Managed by ${pgCompanyCache}. Tap a contact below to reach out.`;
-    } else if (pgNameCache) {
-      document.querySelector('#contactModal .modal-subtitle').textContent =
-        `Get in touch with the owner of ${pgNameCache} directly.`;
+    const phone = pgOwnerCache.phone_number || null;
+    const email = pgOwnerCache.email        || null;
+    const name  = pgOwnerCache.username     || 'Owner';
+
+    // Update modal subtitle
+    document.querySelector('#contactModal .modal-subtitle').textContent =
+      `Get in touch with the owner of ${pgNameCache} directly.`;
+
+    // Build contact HTML
+    let html = `<p style="font-size:.88rem;color:var(--muted);margin-bottom:14px">
+                  <strong style="color:var(--ink)">${esc(name)}</strong> is managing this property.
+                </p>`;
+
+    if (phone) {
+      html += `
+        <a href="tel:${esc(phone)}" class="contact-item phone">
+          <div class="ci-icon">📱</div>
+          <div class="ci-info">
+            <span class="ci-label">Phone</span>
+            <span class="ci-value">${esc(phone)}</span>
+          </div>
+        </a>`;
     }
+
+    if (email) {
+      html += `
+        <a href="mailto:${esc(email)}" class="contact-item email">
+          <div class="ci-icon">✉️</div>
+          <div class="ci-info">
+            <span class="ci-label">Email</span>
+            <span class="ci-value">${esc(email)}</span>
+          </div>
+        </a>`;
+    }
+
+    if (!phone && !email) {
+      html += `<p style="color:var(--muted);font-size:.88rem;text-align:center;padding:16px 0;">
+                 No contact details available for this owner.
+               </p>`;
+    }
+
+    // Hide spinner, show info directly
+    document.getElementById('contactLoading').style.display = 'none';
+    document.getElementById('contactInfo').innerHTML        = html;
+    document.getElementById('contactInfo').style.display   = 'flex';
+
     openModal('contactModal');
-
-    try {
-      // Try numeric-id endpoint first; if owner id wasn't numeric we fall
-      // back to the PG-filtered list endpoint.
-      let res;
-      if (pgOwnerId) {
-        res = await fetch(`/api/v1/accounts/${pgOwnerId}/`, {
-          headers: { 'Authorization': `Token ${token}` },
-        });
-        // If the id-based endpoint 404s, retry with the list endpoint
-        if (res.status === 404) {
-          res = await fetch(`/api/v1/accounts/?pg=${pgId}`, {
-            headers: { 'Authorization': `Token ${token}` },
-          });
-        }
-      } else {
-        res = await fetch(`/api/v1/accounts/?pg=${pgId}`, {
-          headers: { 'Authorization': `Token ${token}` },
-        });
-      }
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const data = await res.json();
-
-      // API may return an array (list) or a single object
-      const owner = Array.isArray(data) ? data[0] : data;
-
-      if (!owner) throw new Error('No owner data returned.');
-
-      const phone = owner.phone_number || owner.phone || null;
-      const email = owner.email || null;
-      const name  = owner.name || owner.full_name || owner.username || 'Owner';
-
-      let html = `<p style="font-size:.88rem;color:var(--muted);margin-bottom:14px">
-                    <strong style="color:var(--ink)">${esc(name)}</strong> is managing this property.
-                  </p>`;
-
-      if (phone) {
-        html += `
-          <a href="tel:${esc(phone)}" class="contact-item phone">
-            <div class="ci-icon">📱</div>
-            <div class="ci-info">
-              <span class="ci-label">Phone</span>
-              <span class="ci-value">${esc(phone)}</span>
-            </div>
-          </a>`;
-      }
-
-      if (email) {
-        html += `
-          <a href="mailto:${esc(email)}" class="contact-item email">
-            <div class="ci-icon">✉️</div>
-            <div class="ci-info">
-              <span class="ci-label">Email</span>
-              <span class="ci-value">${esc(email)}</span>
-            </div>
-          </a>`;
-      }
-
-      if (!phone && !email) {
-        html += `<p style="color:var(--muted);font-size:.88rem;text-align:center;padding:16px 0;">
-                   No contact details available for this owner.
-                 </p>`;
-      }
-
-      document.getElementById('contactInfo').innerHTML = html;
-      document.getElementById('contactLoading').style.display = 'none';
-      document.getElementById('contactInfo').style.display    = 'flex';
-
-    } catch (err) {
-      console.error(err);
-      document.getElementById('contactLoading').innerHTML = `
-        <p style="color:#dc2626;font-size:.88rem;">
-          ❌ Could not load owner details. Please try again.
-        </p>`;
-    }
   });
 
 
