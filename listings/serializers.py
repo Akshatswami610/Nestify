@@ -1,14 +1,41 @@
 from rest_framework import serializers
+from django.contrib.auth import get_user_model
 from .models import PG, PGImage
 
+User = get_user_model()
+
+
+# ─────────────────────────────
+# Owner Serializer (NEW)
+# ─────────────────────────────
+class OwnerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'email',
+            'phone_number',  # ⚠️ make sure this exists in your User model
+        ]
+
+
+# ─────────────────────────────
+# PG Image Serializer
+# ─────────────────────────────
 class PGImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PGImage
         fields = ['id', 'image']
 
+
+# ─────────────────────────────
+# PG Serializer (UPDATED)
+# ─────────────────────────────
 class PGSerializer(serializers.ModelSerializer):
     images = PGImageSerializer(many=True, read_only=True)
-    owner = serializers.ReadOnlyField(source='owner.username')
+
+    # ✅ FIX: return full owner object instead of just username
+    owner = OwnerSerializer(read_only=True)
 
     # for uploading multiple images
     uploaded_images = serializers.ListField(
@@ -21,7 +48,7 @@ class PGSerializer(serializers.ModelSerializer):
         model = PG
         fields = [
             'pg_id',
-            'owner',
+            'owner',  # now contains full owner data
             'name',
             'description',
             'rent',
@@ -41,9 +68,13 @@ class PGSerializer(serializers.ModelSerializer):
             'uploaded_images',  # for POST/PUT
         ]
 
-    # ✅ CREATE with images
+    # ─────────────────────────────
+    # CREATE with images
+    # ─────────────────────────────
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
+
+        # owner should come from request.user in view
         pg = PG.objects.create(**validated_data)
 
         for image in uploaded_images:
@@ -51,7 +82,9 @@ class PGSerializer(serializers.ModelSerializer):
 
         return pg
 
-    # ✅ UPDATE with optional new images
+    # ─────────────────────────────
+    # UPDATE with optional new images
+    # ─────────────────────────────
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
 
