@@ -1318,19 +1318,23 @@ document.getElementById('listPGForm').addEventListener('submit', async function(
 
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded', () => {
-  if (token()) {
-    loadProfile();
-    loadListings();
-    // silently pre-fetch requests for badge count
-    fetch(`${API_BASE}/requests/`, { headers: { 'Authorization': `Token ${token()}` } })
-      .then(r => r.json())
-      .then(data => {
-        const reqs = Array.isArray(data) ? data : (data.results || []);
-        const pending = reqs.filter(r => r.status === 'pending').length;
-        const badge = document.getElementById('requests-count-badge');
-        if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline-block'; }
-      }).catch(() => {});
+  if (!token()) {
+    sessionStorage.setItem('nestify_msg', '🔒 Please log in to access the dashboard.');
+    window.location.href = '/login/?next=/owner-dashboard/';
+    return;
   }
+
+  loadProfile();
+  loadListings();
+  // silently pre-fetch requests for badge count
+  fetch(`${API_BASE}/requests/`, { headers: { 'Authorization': `Token ${token()}` } })
+    .then(r => r.json())
+    .then(data => {
+      const reqs = Array.isArray(data) ? data : (data.results || []);
+      const pending = reqs.filter(r => r.status === 'pending').length;
+      const badge = document.getElementById('requests-count-badge');
+      if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline-block'; }
+    }).catch(() => {});
 });
 </script>
 {% endblock %}
