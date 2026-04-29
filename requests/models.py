@@ -8,13 +8,15 @@ User = settings.AUTH_USER_MODEL
 class Requests(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
-        ('accepted', 'Accepted'), ]
-    pg = models.ForeignKey( PG, on_delete=models.CASCADE, related_name='requests', null=True, blank=True )
+        ('accepted', 'Accepted'),
+    ]
+    pg = models.ForeignKey(PG, on_delete=models.CASCADE, related_name='requests', null=True, blank=True)
     name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=10)
     visit_date = models.DateField()
     visit_time = models.TimeField()
-    status = models.CharField(choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     timestamp = models.DateTimeField(default=timezone.now)
+
     def __str__(self):
         return self.name
