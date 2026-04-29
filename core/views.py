@@ -23,3 +23,9 @@ def support(request):
 
 def pg(request, id=None):
     return render(request, 'pg.html')
+
+def termsofservice(request):
+    return render(request, 'terms-of-service.html')
+
+def privacypolicy(request):
+    return render(request, 'privacy-policy.html')
