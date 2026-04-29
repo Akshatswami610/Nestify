@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Nestify – Find Your Perfect PG{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --coral:   #FF5A5F;
+      --coral-d: #e04a4f;
+      --coral-l: rgba(255,90,95,.1);
+      --ink:     #1a1a2e;
+      --ink-2:   #2d2d44;
+      --muted:   #6b7280;
+      --border:  #e5e7eb;
+      --bg:      #f9f7f5;
+      --card:    #ffffff;
+      --ease:    cubic-bezier(.22,1,.36,1);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(229,231,235,.6);
+      padding: 0 32px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      animation: navSlideDown .5s var(--ease) both;
+    }
+
+    @keyframes navSlideDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+      transition: opacity .2s;
+    }
+    .nav-logo:hover { opacity: .85; }
+    .nav-logo-icon {
+      width: 34px; height: 34px;
+      background: var(--coral);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(255,90,95,.3);
+      transition: transform .2s var(--ease), box-shadow .2s;
+    }
+    .nav-logo:hover .nav-logo-icon {
+      transform: rotate(-5deg) scale(1.05);
+      box-shadow: 0 6px 18px rgba(255,90,95,.4);
+    }
+    .nav-logo-icon svg { fill: #fff; }
+    .nav-logo-name {
+      font-family: 'Fraunces', serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: -.02em;
+    }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .nav-links a {
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 500;
+      color: var(--muted);
+      padding: 7px 14px;
+      border-radius: 8px;
+      transition: color .2s, background .2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 50%; right: 50%;
+      height: 2px;
+      background: var(--coral);
+      border-radius: 2px;
+      transition: left .2s var(--ease), right .2s var(--ease);
+    }
+    .nav-links a:hover { color: var(--ink); background: #f3f4f6; }
+    .nav-links a:hover::after, .nav-links a.active::after { left: 14px; right: 14px; }
+    .nav-links a.active { color: var(--coral); }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+
+    .btn-nav-ghost {
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--ink);
+      padding: 8px 18px;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      transition: border-color .2s, background .2s, color .2s, transform .15s;
+    }
+    .btn-nav-ghost:hover {
+      border-color: var(--coral);
+      background: var(--coral);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .btn-nav-primary {
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 600;
+      color: #fff;
+      padding: 8px 20px;
+      background: var(--coral);
+      border-radius: 100px;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 12px rgba(255,90,95,.25);
+    }
+    .btn-nav-primary:hover {
+      background: var(--coral-d);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(255,90,95,.35);
+    }
+
+    /* hamburger */
+    .nav-hamburger {
+      display: none;
+      background: none; border: none; cursor: pointer;
+      padding: 6px; color: var(--ink);
+      border-radius: 8px;
+      transition: background .2s;
+    }
+    .nav-hamburger:hover { background: #f3f4f6; }
+
+    .mobile-menu {
+      display: none;
+      position: fixed; inset: 64px 0 0 0;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(20px);
+      z-index: 99;
+      flex-direction: column;
+      padding: 24px;
+      gap: 6px;
+      animation: slideDown .2s var(--ease);
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      text-decoration: none;
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--ink);
+      padding: 12px 16px;
+      border-radius: 12px;
+      transition: background .2s;
+    }
+    .mobile-menu a:hover { background: #f3f4f6; }
+    .mobile-menu .mob-cta {
+      margin-top: 8px;
+      background: var(--coral);
+      color: #fff !important;
+      text-align: center;
+      border-radius: 14px;
+      padding: 14px;
+      font-weight: 600 !important;
+      box-shadow: 0 4px 16px rgba(255,90,95,.3);
+    }
+    .mobile-menu .mob-cta:hover { background: var(--coral-d) !important; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── MAIN ── */
+    main { flex: 1; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,.55);
+      padding: 48px 32px 28px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .footer-brand .logo-name {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      color: #fff;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-brand .logo-name::before {
+      content: '';
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--coral);
+      border-radius: 50%;
+    }
+    .footer-brand p {
+      font-size: .82rem;
+      margin-top: 8px;
+      max-width: 210px;
+      line-height: 1.65;
+    }
+    .footer-links { display: flex; gap: 48px; flex-wrap: wrap; }
+    .footer-col h4 {
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 14px;
+    }
+    .footer-col a {
+      display: block;
+      text-decoration: none;
+      font-size: .83rem;
+      color: rgba(255,255,255,.55);
+      margin-bottom: 10px;
+      transition: color .2s, transform .2s;
+    }
+    .footer-col a:hover { color: #fff; transform: translateX(3px); }
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 32px auto 0;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: .78rem;
+    }
+    .footer-bottom span { color: var(--coral); font-weight: 600; }
+
+    /* ── AUTH NAV ── */
+    .nav-actions-auth { display: flex; align-items: center; gap: 10px; }
+
+
+    @keyframes badgePop {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    .btn-nav-dashboard {
+      text-decoration: none;
+      font-size: .875rem;
+      font-weight: 600;
+      color: #fff;
+      padding: 8px 20px;
+      background: var(--coral);
+      border-radius: 100px;
+      display: flex; align-items: center; gap: 6px;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 12px rgba(255,90,95,.25);
+    }
+    .btn-nav-dashboard:hover {
+      background: var(--coral-d);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(255,90,95,.35);
+    }
+
+    .btn-nav-logout {
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 100px;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--muted);
+      padding: 8px 16px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      transition: border-color .2s, color .2s, background .2s, transform .15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-nav-logout:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: #fef2f2;
+      transform: translateY(-1px);
+    }
+
+    .nav-avatar {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--coral), #ff9a6c);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .8rem; color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(255,90,95,.3);
+      transition: transform .2s var(--ease);
+      cursor: default;
+    }
+    .nav-avatar:hover { transform: scale(1.1); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links, .nav-actions, .nav-actions-auth { display: none; }
+      .nav-hamburger { display: flex; }
+      .footer-links { gap: 28px; }
+      footer { padding: 40px 20px 24px; }
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+    </div>
+    <span class="nav-logo-name">Nestify</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/about/">About</a>
+  </div>
+
+  <!-- Guest actions -->
+  <div class="nav-actions" id="nav-guest">
+    <a href="/login/" class="btn-nav-ghost">Login</a>
+    <a href="/signup/" class="btn-nav-primary">Sign Up Free</a>
+  </div>
+
+  <!-- Auth actions -->
+<div class="nav-actions-auth" id="nav-auth" style="display:none;">
+
+  <a href="/owner-dashboard/" class="btn-nav-dashboard">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+    </svg>
+    Dashboard
+  </a>
+
+  <button class="btn-nav-logout" id="nav-logout-btn" title="Logout">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58
+               2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1
+               0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+    </svg>
+  </button>
+
+</div>
+
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/">🏠 Home</a>
+  <a href="/about/">ℹ️ About</a>
+  <a href="/login/" id="mob-login">🔑 Login</a>
+  <a href="/signup/" class="mob-cta" id="mob-signup">Sign Up Free →</a>
+  <a href="/owner-dashboard/" id="mob-dashboard" style="display:none;">📊 Dashboard</a>
+  <a href="#" id="mob-logout" class="mob-cta" style="display:none;background:#ef4444;box-shadow:0 4px 16px rgba(239,68,68,.3);">Logout →</a>
+</div>
+
+<!-- ── MAIN CONTENT ── -->
+<main>
+{% block content %}
+{% endblock %}
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="logo-name">Nestify</div>
+      <p>Your trusted platform for finding verified PGs across India.</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="/about/">About Us</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="/privacy/">Privacy Policy</a>
+        <a href="/terms/">Terms of Service</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>© 2026 Nestify. All rights reserved.</div>
+    <div>Made with <span>♥</span> for renters across India</div>
+  </div>
+</footer>
+
+<script>
+  /* ── Mobile menu toggle ── */
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', isOpen);
+  });
+  mobileMenu.querySelectorAll('a').forEach(a =>
+    a.addEventListener('click', () => mobileMenu.classList.remove('open'))
+  );
+  /* Close on outside click */
+  document.addEventListener('click', e => {
+    if (!mobileMenu.contains(e.target) && !hamburger.contains(e.target)) {
+      mobileMenu.classList.remove('open');
+    }
+  });
+
+  /* ── Auth-aware navbar ── */
+  (function initNavAuth() {
+    const token = localStorage.getItem('nestify_token');
+
+    const navGuest  = document.getElementById('nav-guest');
+    const navAuth   = document.getElementById('nav-auth');
+    const navAvatar = document.getElementById('nav-avatar');
+    const logoutBtn = document.getElementById('nav-logout-btn');
+
+
+    const mobLogin     = document.getElementById('mob-login');
+    const mobSignup    = document.getElementById('mob-signup');
+
+    const mobDashboard = document.getElementById('mob-dashboard');
+    const mobLogout    = document.getElementById('mob-logout');
+
+    function doLogout() {
+      localStorage.removeItem('nestify_token');
+      localStorage.removeItem('nestify_refresh');
+      window.location.href = '/login/';
+    }
+
+    if (token) {
+      navGuest.style.display = 'none';
+      navAuth.style.display  = 'flex';
+
+      mobLogin.style.display     = 'none';
+      mobSignup.style.display    = 'none';
+
+      mobDashboard.style.display = 'block';
+      mobLogout.style.display    = 'block';
+
+      try {
+        const payload  = JSON.parse(atob(token.split('.')[1]));
+        const name     = payload.name || payload.username || payload.email || '';
+        const initials = name.split(/[\s@]+/).slice(0, 2)
+                            .map(w => w[0]?.toUpperCase() || '').join('') || '?';
+        navAvatar.textContent = initials;
+        navAvatar.title       = name || 'My Account';
+      } catch (_) { /* keep '?' */ }
+
+      logoutBtn.addEventListener('click', doLogout);
+      mobLogout.addEventListener('click', e => { e.preventDefault(); doLogout(); });
+
+
+    }
+  })();
+</script>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>
