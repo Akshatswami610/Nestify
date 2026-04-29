@@ -692,6 +692,10 @@
         <button class="btn-book" id="bookBtn">🏠 Book a Visit</button>
         <button class="btn-book-ghost" id="contactBtn">📞 Contact Owner</button>
 
+        <div class="owner-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Free to enquire · No booking fees
+        </div>
       </div>
     </div>
 
@@ -1044,13 +1048,6 @@
   //  CONTACT OWNER — no API call, use cached pg.owner
   // ══════════════════════════════════════
   document.getElementById('contactBtn').addEventListener('click', () => {
-    const token = localStorage.getItem('nestify_token');
-    if (!token) {
-      showToast('Please log in to contact the owner.', 'error');
-      setTimeout(() => { window.location.href = `/login/?next=/pg/${pgId}/`; }, 1500);
-      return;
-    }
-
     const phone = pgOwnerCache.phone_number || null;
     const email = pgOwnerCache.email        || null;
     const name  = pgOwnerCache.username     || 'Owner';
