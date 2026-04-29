@@ -1,0 +1,1128 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ pg.name }} – Nestify{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── BREADCRUMB ── */
+  .breadcrumb {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 32px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: .8rem;
+    color: var(--muted);
+    animation: fadeUp .4s var(--ease) both;
+  }
+  .breadcrumb a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .breadcrumb a:hover { color: var(--coral); }
+
+  /* ── DETAIL LAYOUT ── */
+  .detail-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 48px;
+    align-items: start;
+  }
+
+  /* ── GALLERY ── */
+  .gallery-main {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0ebe6, #e8e2dc);
+    position: relative;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    animation: fadeUp .5s var(--ease) .1s both;
+  }
+  .gallery-main img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: opacity .35s, transform .35s var(--ease);
+  }
+  .gallery-main img.changing { opacity: 0; transform: scale(1.02); }
+
+  .gallery-main-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+  }
+
+  .gallery-thumbs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    animation: fadeUp .5s var(--ease) .15s both;
+  }
+  .thumb {
+    width: 74px; height: 54px;
+    border-radius: 10px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    transition: border-color .2s, transform .2s var(--ease), box-shadow .2s;
+    flex-shrink: 0;
+  }
+  .thumb:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+  .thumb.active { border-color: var(--coral); box-shadow: 0 0 0 3px rgba(255,90,95,.15); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ── PG HEADER ── */
+  .pg-header { margin: 28px 0 0; animation: fadeUp .5s var(--ease) .2s both; }
+  .pg-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .pg-title {
+    font-family: 'Fraunces', serif;
+    font-size: 2.1rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -.03em;
+    line-height: 1.18;
+  }
+  .pg-avail-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: 7px 16px;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .pg-avail-badge::before {
+    content: '';
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse-dot 2s ease infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .5; transform: scale(.7); }
+  }
+  .pg-avail-badge.avail { background: #d1fae5; color: #059669; }
+  .pg-avail-badge.full  { background: #fee2e2; color: #dc2626; }
+
+  .pg-location-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: .9rem;
+    margin: 10px 0 22px;
+  }
+
+  /* ── TABS ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -2px;
+    transition: color .2s, border-color .2s;
+  }
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active { color: var(--ink); border-bottom-color: var(--coral); font-weight: 600; }
+
+  .tab-panel { display: none; animation: fadeIn .2s ease both; }
+  .tab-panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .pg-description {
+    font-size: .95rem;
+    line-height: 1.8;
+    color: #374151;
+  }
+  .pg-description:empty::before {
+    content: 'No description provided.';
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── FACILITIES GRID ── */
+  .facilities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .facility-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 18px 12px;
+    border-radius: 14px;
+    font-size: .8rem;
+    font-weight: 500;
+    text-align: center;
+    border: 1.5px solid var(--border);
+    transition: transform .2s var(--ease), box-shadow .2s;
+  }
+  .facility-item:hover { transform: translateY(-2px); }
+  .facility-item.has  { color: #065f46; background: #f0fdf4; border-color: #bbf7d0; box-shadow: 0 2px 8px rgba(5,150,105,.08); }
+  .facility-item.none { color: var(--muted); background: #fafafa; opacity: .5; }
+  .facility-item .fac-icon { font-size: 1.5rem; }
+  .facility-item .fac-sub { font-size: .65rem; opacity: .65; margin-top: -4px; }
+
+  /* ── BOOKING CARD ── */
+  .booking-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 28px;
+    position: sticky;
+    top: 80px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.08);
+    animation: fadeUp .5s var(--ease) .15s both;
+    transition: box-shadow .3s;
+  }
+  .booking-card:hover { box-shadow: 0 12px 48px rgba(0,0,0,.12); }
+
+  .price-display {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .price-main {
+    font-family: 'Fraunces', serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -.04em;
+    line-height: 1;
+  }
+  .price-mo { font-size: .9rem; color: var(--muted); }
+  .deposit-note {
+    font-size: .8rem;
+    color: var(--muted);
+    margin-bottom: 22px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .85rem;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row:last-of-type { border-bottom: none; }
+  .detail-row .label { color: var(--muted); }
+  .detail-row .value { font-weight: 600; color: var(--ink); }
+  .gender-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,90,95,.1);
+    color: var(--coral);
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+
+  /* ── MANAGED BY ── */
+  .managed-by {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(255,90,95,.05), rgba(255,90,95,.02));
+    border: 1px solid rgba(255,90,95,.15);
+    border-radius: 12px;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  .managed-by .company-icon {
+    width: 28px; height: 28px;
+    background: var(--coral);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .managed-by .company-icon svg { fill: #fff; }
+  .managed-by .company-info { display: flex; flex-direction: column; gap: 1px; }
+  .managed-by .company-label { font-size: .68rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .managed-by .company-name  { font-weight: 600; color: var(--ink); font-size: .85rem; }
+
+  .btn-book {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 6px 20px rgba(255,90,95,.35);
+    text-align: center;
+    text-decoration: none;
+    letter-spacing: .01em;
+  }
+  .btn-book:hover:not(:disabled) {
+    background: var(--coral-d);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(255,90,95,.4);
+  }
+  .btn-book:active:not(:disabled) { transform: translateY(0); }
+  .btn-book:disabled {
+    opacity: .5; cursor: not-allowed; transform: none;
+    box-shadow: none; background: #9ca3af;
+  }
+
+  .btn-book-ghost {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    background: none;
+    color: var(--ink);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .93rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color .2s, background .2s, transform .15s;
+    text-align: center;
+  }
+  .btn-book-ghost:hover {
+    border-color: var(--ink);
+    background: #f9f7f5;
+    transform: translateY(-1px);
+  }
+
+  .owner-note {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #f9f7f5;
+    border-radius: 10px;
+    font-size: .76rem;
+    color: var(--muted);
+    line-height: 1.5;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(6px);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s var(--ease);
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .modal {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 36px 32px 32px;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.22);
+    position: relative;
+    transform: translateY(24px) scale(.97);
+    transition: transform .3s var(--ease);
+  }
+  .modal-overlay.open .modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: #f3f4f6;
+    border: none;
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    transition: background .2s, color .2s, transform .2s;
+    font-size: 1.1rem;
+  }
+  .modal-close:hover { background: #e5e7eb; color: var(--ink); transform: rotate(90deg); }
+
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -.03em;
+    margin-bottom: 4px;
+  }
+  .modal-subtitle {
+    font-size: .84rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  /* ── FORM STYLES ── */
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 6px;
+    letter-spacing: .01em;
+  }
+  .form-group label span { color: var(--coral); margin-left: 2px; }
+  .form-control {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .9rem;
+    color: var(--ink);
+    background: var(--bg);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+  }
+  .form-control:focus {
+    border-color: var(--coral);
+    box-shadow: 0 0 0 3px rgba(255,90,95,.1);
+    background: #fff;
+  }
+  .form-control::placeholder { color: #9ca3af; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-error {
+    font-size: .75rem;
+    color: #dc2626;
+    margin-top: 5px;
+    display: none;
+  }
+  .form-group.has-error .form-control { border-color: #dc2626; }
+  .form-group.has-error .form-error   { display: block; }
+
+  .btn-submit {
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px;
+    background: var(--coral);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 6px 20px rgba(255,90,95,.3);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-submit:hover:not(:disabled) {
+    background: var(--coral-d);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(255,90,95,.38);
+  }
+  .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  /* Spinner inside button */
+  .btn-spinner {
+    width: 16px; height: 16px;
+    border: 2.5px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .65s linear infinite;
+    display: none;
+  }
+  .btn-submit.loading .btn-spinner { display: block; }
+  .btn-submit.loading .btn-text    { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── CONTACT MODAL CONTENT ── */
+  .contact-loading {
+    text-align: center;
+    padding: 32px 0;
+  }
+  .contact-loading .spin-sm {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--coral);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 14px;
+  }
+
+  .contact-info { display: flex; flex-direction: column; gap: 14px; }
+  .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    transition: border-color .2s, background .2s, transform .2s var(--ease);
+    text-decoration: none;
+    color: inherit;
+  }
+  .contact-item:hover {
+    border-color: var(--coral);
+    background: rgba(255,90,95,.03);
+    transform: translateX(3px);
+  }
+  .contact-item .ci-icon {
+    width: 42px; height: 42px;
+    border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .contact-item.phone .ci-icon { background: #d1fae5; }
+  .contact-item.email .ci-icon { background: #dbeafe; }
+  .contact-item .ci-info { display: flex; flex-direction: column; gap: 2px; }
+  .contact-item .ci-label {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--muted);
+  }
+  .contact-item .ci-value { font-size: .95rem; font-weight: 600; color: var(--ink); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--ink);
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 14px;
+    font-size: .875rem;
+    font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,.25);
+    z-index: 999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform .3s var(--ease), opacity .3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 320px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { background: #059669; }
+  .toast.error   { background: #dc2626; }
+
+  /* ── LOADING ── */
+  .page-loading {
+    text-align: center;
+    padding: 120px 20px;
+    color: var(--muted);
+  }
+  .spin {
+    width: 44px; height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--coral);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 820px) {
+    .detail-wrap { grid-template-columns: 1fr; padding: 20px 20px 56px; gap: 32px; }
+    .booking-card { position: static; box-shadow: 0 4px 20px rgba(0,0,0,.07); }
+    .breadcrumb { padding: 16px 20px 0; }
+    .pg-title { font-size: 1.7rem; }
+    .modal { padding: 28px 20px 24px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Loading state -->
+<div id="pageLoading" class="page-loading">
+  <div class="spin"></div>
+  <p>Loading PG details…</p>
+</div>
+
+<!-- Main content (hidden until loaded) -->
+<div id="pageContent" style="display:none;">
+
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/">Home</a>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    <span id="breadcrumbName">PG Details</span>
+  </nav>
+
+  <div class="detail-wrap">
+
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- Gallery -->
+      <div class="gallery-main" id="galleryMain">
+        <div class="gallery-main-placeholder" id="galleryPlaceholder">🏠</div>
+      </div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+
+      <!-- PG Info -->
+      <div class="pg-header">
+        <div class="pg-header-top">
+          <h1 class="pg-title" id="pgName">—</h1>
+          <span class="pg-avail-badge" id="availBadge"></span>
+        </div>
+        <div class="pg-location-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--coral)"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span id="pgLocation">—</span>
+        </div>
+
+        <div class="tab-nav">
+          <button class="tab-btn active" data-tab="about">About</button>
+          <button class="tab-btn" data-tab="facilities">Facilities</button>
+        </div>
+
+        <div class="tab-panel active" id="tab-about">
+          <p class="pg-description" id="pgDescription"></p>
+        </div>
+        <div class="tab-panel" id="tab-facilities">
+          <div class="facilities-grid" id="facilitiesGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN — Booking Card -->
+    <div>
+      <div class="booking-card">
+        <div class="price-display">
+          <span class="price-main" id="pgRent">₹—</span>
+          <span class="price-mo">/ month</span>
+        </div>
+        <div class="deposit-note" id="depositNote"></div>
+
+        <div class="detail-row">
+          <span class="label">City</span>
+          <span class="value" id="detailCity">—</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Gender</span>
+          <span class="value"><span class="gender-chip" id="detailGender">—</span></span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Status</span>
+          <span class="value" id="detailStatus">—</span>
+        </div>
+        <div class="detail-row" id="bookingFeeRow" style="display:none;">
+          <span class="label">Booking Fee</span>
+          <span class="value" id="detailBookingFee">—</span>
+        </div>
+
+        <!-- Managed By -->
+        <div class="managed-by" id="managedBy" style="display:none;">
+          <div class="company-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
+          </div>
+          <div class="company-info">
+            <span class="company-label">Managed by</span>
+            <span class="company-name" id="companyName">—</span>
+          </div>
+        </div>
+
+        <button class="btn-book" id="bookBtn">🏠 Book a Visit</button>
+        <button class="btn-book-ghost" id="contactBtn">📞 Contact Owner</button>
+
+        <div class="owner-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          Free to enquire · No booking fees
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL 1 — Book a Visit
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="bookModal" role="dialog" aria-modal="true" aria-labelledby="bookModalTitle">
+  <div class="modal">
+    <button class="modal-close" id="bookModalClose" aria-label="Close">✕</button>
+    <h2 class="modal-title" id="bookModalTitle">📅 Book a Visit</h2>
+    <p class="modal-subtitle">Fill in your details and we'll confirm your visit slot.</p>
+
+    <div class="form-group" id="fg-name">
+      <label for="visitName">Full Name <span>*</span></label>
+      <input type="text" id="visitName" class="form-control" placeholder="e.g. Rahul Sharma" maxlength="100" autocomplete="name"/>
+      <div class="form-error" id="err-name">Please enter your full name.</div>
+    </div>
+
+    <div class="form-group" id="fg-phone">
+      <label for="visitPhone">Phone Number <span>*</span></label>
+      <input type="tel" id="visitPhone" class="form-control" placeholder="10-digit mobile number" maxlength="10" inputmode="numeric" autocomplete="tel"/>
+      <div class="form-error" id="err-phone">Please enter a valid 10-digit number.</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group" id="fg-date">
+        <label for="visitDate">Visit Date <span>*</span></label>
+        <input type="date" id="visitDate" class="form-control"/>
+        <div class="form-error" id="err-date">Please pick a future date.</div>
+      </div>
+      <div class="form-group" id="fg-time">
+        <label for="visitTime">Visit Time <span>*</span></label>
+        <input type="time" id="visitTime" class="form-control"/>
+        <div class="form-error" id="err-time">Please select a time.</div>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submitVisitBtn">
+      <div class="btn-spinner"></div>
+      <span class="btn-text">✅ Confirm Booking</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL 2 — Contact Owner
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+  <div class="modal">
+    <button class="modal-close" id="contactModalClose" aria-label="Close">✕</button>
+    <h2 class="modal-title" id="contactModalTitle">📞 Owner Details</h2>
+    <p class="modal-subtitle">Get in touch with the property owner directly.</p>
+
+    <div id="contactLoading" class="contact-loading">
+      <div class="spin-sm"></div>
+      <p style="font-size:.85rem;color:var(--muted)">Fetching owner details…</p>
+    </div>
+
+    <div id="contactInfo" class="contact-info" style="display:none;"></div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // ── Utilities ──
+  function esc(str) {
+    return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className   = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3500);
+  }
+
+  // ── Get PG ID from URL: /pg/<id>/ ──
+  function getPgId() {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const idx   = parts.indexOf('pg');
+    return (idx !== -1 && parts[idx + 1]) ? parts[idx + 1] : null;
+  }
+
+  const pgId     = getPgId();
+  const API_BASE = '/api/v1/listings/';
+  let pgNameCache  = '';  // for book modal subtitle
+  let pgOwnerCache = {};  // stores pg.owner object from API
+
+  // ── Load PG ──
+  async function loadPG() {
+    if (!pgId) { showError('Invalid PG URL.'); return; }
+    try {
+      const res = await fetch(`${API_BASE}${pgId}/`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const pg = await res.json();
+      render(pg);
+    } catch (err) {
+      showError('Could not load this PG. Please try again.');
+    }
+  }
+
+  function showError(msg) {
+    document.getElementById('pageLoading').innerHTML = `
+      <div style="font-size:2.5rem;margin-bottom:16px">⚠️</div>
+      <p style="color:var(--ink);font-size:1.1rem;font-weight:600;margin-bottom:8px">Something went wrong</p>
+      <p style="margin-bottom:24px">${msg}</p>
+      <a href="/" style="display:inline-flex;align-items:center;gap:6px;color:var(--coral);font-weight:600;text-decoration:none;border:1.5px solid var(--coral);padding:10px 22px;border-radius:100px;transition:background .2s;" onmouseover="this.style.background='var(--coral)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='var(--coral)'">← Back to listings</a>`;
+  }
+
+  function render(pg) {
+    document.getElementById('pageLoading').style.display = 'none';
+    document.getElementById('pageContent').style.display = 'block';
+
+    // Cache owner object and pg name for modals
+    pgOwnerCache = pg.owner || {};
+    pgNameCache  = pg.name  || '';
+
+    // Meta
+    document.getElementById('breadcrumbName').textContent = pg.name;
+    document.title = `${pg.name} – Nestify`;
+
+    // Header
+    document.getElementById('pgName').textContent     = pg.name;
+    document.getElementById('pgLocation').textContent = `${pg.location}, ${pg.city}`;
+
+    const badge = document.getElementById('availBadge');
+    badge.textContent = pg.is_available ? 'Available' : 'Fully Booked';
+    badge.className   = `pg-avail-badge ${pg.is_available ? 'avail' : 'full'}`;
+
+    // Description
+    const descEl = document.getElementById('pgDescription');
+    descEl.textContent = pg.description || '';
+    if (!pg.description) descEl.style.fontStyle = 'italic';
+
+    // Price
+    document.getElementById('pgRent').textContent =
+      pg.rent ? `₹${Number(pg.rent).toLocaleString('en-IN')}` : 'N/A';
+
+    document.getElementById('depositNote').textContent =
+      pg.deposit
+        ? `Security deposit: ₹${Number(pg.deposit).toLocaleString('en-IN')}`
+        : 'No deposit information provided.';
+
+    // Booking fee
+    if (pg.booking_fees) {
+      document.getElementById('bookingFeeRow').style.display = 'flex';
+      document.getElementById('detailBookingFee').textContent =
+        `₹${Number(pg.booking_fees).toLocaleString('en-IN')}`;
+    }
+
+    // Card details
+    document.getElementById('detailCity').textContent = pg.city;
+    const genderMap = { male: '♂ Male', female: '♀ Female', any: '⚥ Co-living' };
+    document.getElementById('detailGender').textContent = genderMap[pg.gender_preference] || pg.gender_preference;
+    document.getElementById('detailStatus').textContent = pg.is_available ? '✅ Available now' : '❌ Fully booked';
+
+    // Managed by — show owner username if present
+    const ownerName = pg.owner?.username || null;
+    if (ownerName) {
+      document.getElementById('companyName').textContent = ownerName;
+      document.getElementById('managedBy').style.display = 'flex';
+    }
+
+    // Book button
+    const bookBtn = document.getElementById('bookBtn');
+    if (!pg.is_available) {
+      bookBtn.disabled    = true;
+      bookBtn.textContent = 'Currently Full';
+    }
+
+    // Gallery
+    if (pg.images?.length > 0) {
+      document.getElementById('galleryPlaceholder').style.display = 'none';
+      const mainEl  = document.getElementById('galleryMain');
+      const mainImg = document.createElement('img');
+      mainImg.src   = pg.images[0].image;
+      mainImg.alt   = pg.name;
+      mainEl.appendChild(mainImg);
+
+      if (pg.images.length > 1) {
+        const thumbsEl = document.getElementById('galleryThumbs');
+        pg.images.forEach((imgObj, i) => {
+          const thumb     = document.createElement('div');
+          thumb.className = `thumb ${i === 0 ? 'active' : ''}`;
+          thumb.innerHTML = `<img src="${esc(imgObj.image)}" alt="Photo ${i + 1}" loading="lazy">`;
+          thumb.addEventListener('click', () => {
+            mainImg.classList.add('changing');
+            setTimeout(() => {
+              mainImg.src = imgObj.image;
+              mainImg.classList.remove('changing');
+            }, 150);
+            thumbsEl.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+          });
+          thumbsEl.appendChild(thumb);
+        });
+      }
+    }
+
+    // Facilities
+    const facs = [
+      { key: 'wifi',    icon: '📶', label: 'WiFi' },
+      { key: 'food',    icon: '🍽️', label: 'Food' },
+      { key: 'laundry', icon: '👕', label: 'Laundry' },
+      { key: 'ac',      icon: '❄️', label: 'AC' },
+      { key: 'parking', icon: '🅿️', label: 'Parking' },
+    ];
+    document.getElementById('facilitiesGrid').innerHTML = facs.map(f => `
+      <div class="facility-item ${pg[f.key] ? 'has' : 'none'}">
+        <span class="fac-icon">${f.icon}</span>
+        <span>${f.label}</span>
+        ${!pg[f.key] ? '<span class="fac-sub">Not available</span>' : ''}
+      </div>`).join('');
+  }
+
+  // ══════════════════════════════════════
+  //  MODAL HELPERS
+  // ══════════════════════════════════════
+  function openModal(id) {
+    const m = document.getElementById(id);
+    m.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      const el = m.querySelector('input, button:not(.modal-close)');
+      if (el) el.focus();
+    }, 300);
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) closeModal(overlay.id);
+    });
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeModal('bookModal');
+      closeModal('contactModal');
+    }
+  });
+
+  document.getElementById('bookModalClose').addEventListener('click',    () => closeModal('bookModal'));
+  document.getElementById('contactModalClose').addEventListener('click', () => closeModal('contactModal'));
+
+
+  // ══════════════════════════════════════
+  //  BOOK A VISIT — open modal
+  // ══════════════════════════════════════
+  document.getElementById('bookBtn').addEventListener('click', () => {
+    const token = localStorage.getItem('nestify_token');
+    if (!token) {
+      showToast('Please log in to book a visit.', 'error');
+      setTimeout(() => { window.location.href = `/login/?next=/pg/${pgId}/`; }, 1500);
+      return;
+    }
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('visitDate').min = today;
+    if (pgNameCache) {
+      document.querySelector('#bookModal .modal-subtitle').textContent =
+        `Schedule a visit to ${pgNameCache}. We'll notify the owner right away.`;
+    }
+    openModal('bookModal');
+  });
+
+  // ── Validation helpers ──
+  function setError(groupId, show) {
+    document.getElementById(groupId).classList.toggle('has-error', show);
+  }
+
+  function validateBookForm() {
+    const name  = document.getElementById('visitName').value.trim();
+    const phone = document.getElementById('visitPhone').value.trim();
+    const date  = document.getElementById('visitDate').value;
+    const time  = document.getElementById('visitTime').value;
+    const today = new Date().toISOString().split('T')[0];
+
+    let valid = true;
+
+    setError('fg-name',  !name);                          if (!name)  valid = false;
+    setError('fg-phone', !/^\d{10}$/.test(phone));        if (!/^\d{10}$/.test(phone)) valid = false;
+    setError('fg-date',  !date || date < today);          if (!date || date < today) valid = false;
+    setError('fg-time',  !time);                          if (!time) valid = false;
+
+    return valid;
+  }
+
+  // ── Submit booking ──
+  document.getElementById('submitVisitBtn').addEventListener('click', async () => {
+    if (!validateBookForm()) return;
+
+    const btn   = document.getElementById('submitVisitBtn');
+    const token = localStorage.getItem('nestify_token');
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    const payload = {
+      pg:           parseInt(pgId, 10),
+      name:         document.getElementById('visitName').value.trim(),
+      phone_number: document.getElementById('visitPhone').value.trim(),
+      visit_date:   document.getElementById('visitDate').value,
+      visit_time:   document.getElementById('visitTime').value,
+    };
+
+    try {
+      const res = await fetch('/api/v1/requests/', {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Token ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        closeModal('bookModal');
+        showToast('✅ Visit booked! The owner will confirm soon.', 'success');
+        ['visitName','visitPhone','visitDate','visitTime'].forEach(id => {
+          document.getElementById(id).value = '';
+        });
+        ['fg-name','fg-phone','fg-date','fg-time'].forEach(id => setError(id, false));
+      } else {
+        const data = await res.json().catch(() => ({}));
+        const msg  = data?.detail || data?.non_field_errors?.[0] || 'Booking failed. Please try again.';
+        showToast(`❌ ${msg}`, 'error');
+      }
+    } catch (err) {
+      showToast('❌ Network error. Please check your connection.', 'error');
+    } finally {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  });
+
+  // Clear errors on input
+  ['visitName','visitPhone','visitDate','visitTime'].forEach((id, i) => {
+    const groupIds = ['fg-name','fg-phone','fg-date','fg-time'];
+    document.getElementById(id).addEventListener('input', () => setError(groupIds[i], false));
+  });
+
+
+  // ══════════════════════════════════════
+  //  CONTACT OWNER — no API call, use cached pg.owner
+  // ══════════════════════════════════════
+  document.getElementById('contactBtn').addEventListener('click', () => {
+    const token = localStorage.getItem('nestify_token');
+    if (!token) {
+      showToast('Please log in to contact the owner.', 'error');
+      setTimeout(() => { window.location.href = `/login/?next=/pg/${pgId}/`; }, 1500);
+      return;
+    }
+
+    const phone = pgOwnerCache.phone_number || null;
+    const email = pgOwnerCache.email        || null;
+    const name  = pgOwnerCache.username     || 'Owner';
+
+    // Update modal subtitle
+    document.querySelector('#contactModal .modal-subtitle').textContent =
+      `Get in touch with the owner of ${pgNameCache} directly.`;
+
+    // Build contact HTML
+    let html = `<p style="font-size:.88rem;color:var(--muted);margin-bottom:14px">
+                  <strong style="color:var(--ink)">${esc(name)}</strong> is managing this property.
+                </p>`;
+
+    if (phone) {
+      html += `
+        <a href="tel:${esc(phone)}" class="contact-item phone">
+          <div class="ci-icon">📱</div>
+          <div class="ci-info">
+            <span class="ci-label">Phone</span>
+            <span class="ci-value">${esc(phone)}</span>
+          </div>
+        </a>`;
+    }
+
+    if (email) {
+      html += `
+        <a href="mailto:${esc(email)}" class="contact-item email">
+          <div class="ci-icon">✉️</div>
+          <div class="ci-info">
+            <span class="ci-label">Email</span>
+            <span class="ci-value">${esc(email)}</span>
+          </div>
+        </a>`;
+    }
+
+    if (!phone && !email) {
+      html += `<p style="color:var(--muted);font-size:.88rem;text-align:center;padding:16px 0;">
+                 No contact details available for this owner.
+               </p>`;
+    }
+
+    // Hide spinner, show info directly
+    document.getElementById('contactLoading').style.display = 'none';
+    document.getElementById('contactInfo').innerHTML        = html;
+    document.getElementById('contactInfo').style.display   = 'flex';
+
+    openModal('contactModal');
+  });
+
+
+  // ── Tabs ──
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    });
+  });
+
+  loadPG();
+</script>
+{% endblock %}
