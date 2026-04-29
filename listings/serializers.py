@@ -15,7 +15,7 @@ class OwnerSerializer(serializers.ModelSerializer):
             'id',
             'username',
             'email',
-            'phone_number',  # ⚠️ make sure this exists in your User model
+            'phone_number',
         ]
 
 
