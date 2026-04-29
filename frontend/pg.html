@@ -691,11 +691,7 @@
 
         <button class="btn-book" id="bookBtn">🏠 Book a Visit</button>
         <button class="btn-book-ghost" id="contactBtn">📞 Contact Owner</button>
-
-        <div class="owner-note">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#22c55e"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-          Free to enquire · No booking fees
-        </div>
+        
       </div>
     </div>
 
@@ -960,12 +956,6 @@
   //  BOOK A VISIT — open modal
   // ══════════════════════════════════════
   document.getElementById('bookBtn').addEventListener('click', () => {
-    const token = localStorage.getItem('nestify_token');
-    if (!token) {
-      showToast('Please log in to book a visit.', 'error');
-      setTimeout(() => { window.location.href = `/login/?next=/pg/${pgId}/`; }, 1500);
-      return;
-    }
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('visitDate').min = today;
     if (pgNameCache) {
@@ -1001,8 +991,7 @@
   document.getElementById('submitVisitBtn').addEventListener('click', async () => {
     if (!validateBookForm()) return;
 
-    const btn   = document.getElementById('submitVisitBtn');
-    const token = localStorage.getItem('nestify_token');
+    const btn = document.getElementById('submitVisitBtn');
 
     btn.classList.add('loading');
     btn.disabled = true;
@@ -1019,8 +1008,7 @@
       const res = await fetch('/api/v1/requests/', {
         method:  'POST',
         headers: {
-          'Content-Type':  'application/json',
-          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
