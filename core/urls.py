@@ -11,7 +11,7 @@ urlpatterns = [
     path('api/v1/accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('api/v1/listings/', include('listings.urls')),
     path('api/v1/requests/', include('requests.urls')),
-    #path('api/v1/support/', include('support.urls')),
+    path('api/v1/support/', include('support.urls')),
 
     # Frontend pages
     path('', home, name='home'),
