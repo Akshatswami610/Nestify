@@ -801,7 +801,6 @@
       const pg = await res.json();
       render(pg);
     } catch (err) {
-      console.error(err);
       showError('Could not load this PG. Please try again.');
     }
   }
@@ -1039,7 +1038,6 @@
         showToast(`❌ ${msg}`, 'error');
       }
     } catch (err) {
-      console.error(err);
       showToast('❌ Network error. Please check your connection.', 'error');
     } finally {
       btn.classList.remove('loading');
