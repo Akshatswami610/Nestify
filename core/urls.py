@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from .views import login, signup, logout, ownerdashboard, home, pg, about, support
+from .views import login, signup, logout, ownerdashboard, home, pg, about, support, privacypolicy, termsofservice
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,6 +22,8 @@ urlpatterns = [
     path('pg/<int:id>/', pg, name='pg_detail'),
     path('about/', about, name='about'),
     path('support/', support, name='support'),
+    path('privacy-policy/', privacypolicy, name='privacy-policy'),
+    path('terms-of-service/', termsofservice, name='terms-of-service'),
 ]
 
 # Serve media files
