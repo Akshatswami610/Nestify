@@ -556,7 +556,6 @@
 
       renderPGs();
     } catch (err) {
-      console.error('Failed to fetch PGs:', err);
       document.getElementById('pgContainer').className = 'pg-grid';
       document.getElementById('pgContainer').innerHTML = `
         <div class="error-state">
