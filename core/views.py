@@ -18,8 +18,8 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
-def contact(request):
-    return render(request, 'contact.html')
+def support(request):
+    return render(request, 'support.html')
 
 def pg(request, id=None):
     return render(request, 'pg.html')
