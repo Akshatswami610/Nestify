@@ -6,7 +6,7 @@ User = get_user_model()
 
 
 # ─────────────────────────────
-# Owner Serializer (NEW)
+# Owner Serializer
 # ─────────────────────────────
 class OwnerSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,15 +29,13 @@ class PGImageSerializer(serializers.ModelSerializer):
 
 
 # ─────────────────────────────
-# PG Serializer (UPDATED)
+# PG Serializer
 # ─────────────────────────────
 class PGSerializer(serializers.ModelSerializer):
     images = PGImageSerializer(many=True, read_only=True)
-
-    # ✅ FIX: return full owner object instead of just username
     owner = OwnerSerializer(read_only=True)
 
-    # for uploading multiple images
+    # multiple image upload
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(),
         write_only=True,
@@ -48,7 +46,7 @@ class PGSerializer(serializers.ModelSerializer):
         model = PG
         fields = [
             'pg_id',
-            'owner',  # now contains full owner data
+            'owner',
             'name',
             'description',
             'rent',
@@ -64,17 +62,36 @@ class PGSerializer(serializers.ModelSerializer):
             'gender_preference',
             'is_available',
             'created_at',
-            'images',           # for GET
-            'uploaded_images',  # for POST/PUT
+            'images',
+            'uploaded_images',
         ]
 
     # ─────────────────────────────
-    # CREATE with images
+    # VALIDATION (MAX 5 IMAGES TOTAL)
+    # ─────────────────────────────
+    def validate_uploaded_images(self, value):
+        max_images = 5
+
+        # If updating existing PG
+        if self.instance:
+            existing_count = self.instance.images.count()
+        else:
+            existing_count = 0
+
+        if existing_count + len(value) > max_images:
+            raise serializers.ValidationError(
+                f"Maximum {max_images} images allowed. "
+                f"You already have {existing_count} images."
+            )
+
+        return value
+
+    # ─────────────────────────────
+    # CREATE
     # ─────────────────────────────
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
 
-        # owner should come from request.user in view
         pg = PG.objects.create(**validated_data)
 
         for image in uploaded_images:
@@ -83,18 +100,18 @@ class PGSerializer(serializers.ModelSerializer):
         return pg
 
     # ─────────────────────────────
-    # UPDATE with optional new images
+    # UPDATE
     # ─────────────────────────────
     def update(self, instance, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
 
-        # update PG fields
+        # update fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
         instance.save()
 
-        # add new images (does NOT delete old ones)
+        # add new images (without deleting old ones)
         for image in uploaded_images:
             PGImage.objects.create(pg=instance, image=image)
 
