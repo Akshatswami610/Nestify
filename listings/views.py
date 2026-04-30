@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions
 from rest_framework.exceptions import PermissionDenied
-from .models import PG
+from .models import PG, PGImage
 from .serializers import PGSerializer
 
 
@@ -57,3 +57,15 @@ class PGViewSet(viewsets.ModelViewSet):
         if self.request.user != instance.owner:
             raise PermissionDenied("You are not allowed to delete this PG")
         instance.delete()
+
+class PGImageViewSet(viewsets.ModelViewSet):
+    queryset = PGImage.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        image = self.get_object()
+
+        if image.pg.owner != request.user:
+            raise PermissionDenied("You are not allowed to delete this image")
+
+        return super().destroy(request, *args, **kwargs)
