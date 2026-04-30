@@ -8,4 +8,4 @@ class PGAdmin(admin.ModelAdmin):
 
 @admin.register(PGImage)
 class PGImageAdmin(admin.ModelAdmin):
-    list_display = ('pg',)
+    list_display = ('image_id','pg',)
