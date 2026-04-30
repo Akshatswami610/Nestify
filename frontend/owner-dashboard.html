@@ -567,6 +567,69 @@
   }
   .loading-row .spinner { border-color: var(--border); border-top-color: var(--coral); }
 
+  /* ── DELETE PG BUTTON ── */
+  .btn-delete-listing {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: none;
+    border: 1.5px solid #fca5a5;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .75rem;
+    font-weight: 600;
+    color: #ef4444;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, background .2s;
+    white-space: nowrap;
+    margin-left: 6px;
+  }
+  .btn-delete-listing:hover {
+    border-color: #ef4444;
+    background: #fee2e2;
+  }
+  .btn-delete-listing svg { fill: currentColor; }
+
+  /* ── CONFIRM DELETE MODAL ── */
+  .confirm-modal { max-width: 420px; text-align: center; }
+  .confirm-icon {
+    width: 56px; height: 56px;
+    background: #fee2e2;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .confirm-icon svg { fill: #ef4444; }
+  .confirm-title {
+    font-family: 'Fraunces', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .confirm-msg {
+    font-size: .875rem;
+    color: var(--muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .confirm-msg strong { color: var(--ink); }
+  .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+  .btn-danger {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .875rem;
+    font-weight: 600;
+    padding: 10px 22px;
+    cursor: pointer;
+    transition: background .2s, transform .15s, box-shadow .2s;
+    box-shadow: 0 4px 12px rgba(239,68,68,.25);
+  }
+  .btn-danger:hover { background: #dc2626; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(239,68,68,.35); }
+
   /* ── EDIT LISTING MODAL image row ── */
   .existing-imgs-row {
     display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;
@@ -581,6 +644,20 @@
     border: 1.5px solid var(--border);
     display: block;
   }
+  .img-delete-btn {
+    position: absolute;
+    top: -6px; right: -6px;
+    width: 20px; height: 20px;
+    background: #ef4444;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background .15s, transform .15s;
+    z-index: 2;
+  }
+  .img-delete-btn:hover { background: #dc2626; transform: scale(1.15); }
+  .img-delete-btn svg { fill: #fff; display: block; }
 
   /* Responsive */
   @media (max-width: 768px) {
@@ -771,7 +848,7 @@
 
         <div class="form-section-label">Photos</div>
         <div class="upload-zone" id="uploadZone">
-          <input type="file" name="images" id="imageInput" accept="image/*" multiple />
+          <input type="file" name="uploaded_images" id="imageInput" accept="image/*" multiple />
           <svg width="32" height="32" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
           <p>Drag &amp; drop images here or <strong>browse</strong></p>
           <p style="font-size:.75rem;margin-top:4px;">PNG, JPG up to 5 MB each</p>
@@ -885,6 +962,26 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── CONFIRM DELETE MODAL ───────────────── -->
+<div class="modal-backdrop" id="confirmDeleteModal">
+  <div class="modal confirm-modal" style="max-width:420px;">
+    <div class="modal-body" style="padding:36px 28px 28px;">
+      <div class="confirm-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      </div>
+      <div class="confirm-title">Delete this listing?</div>
+      <p class="confirm-msg">You're about to permanently delete <strong id="deletePGName"></strong>. This cannot be undone and all associated data including photos will be removed.</p>
+      <div class="confirm-actions">
+        <button class="btn-ghost" data-close="confirmDeleteModal">Cancel</button>
+        <button class="btn-danger" id="confirmDeleteBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+          Yes, Delete
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -1102,10 +1199,13 @@ async function loadListings() {
               </td>
               <td><span class="badge ${pg.is_available?'badge-green':'badge-red'}">${pg.is_available?'Available':'Occupied'}</span></td>
               <td>
-
                 <button class="btn-edit-listing" onclick="openEditListing(${pg.pg_id})">
                   <svg width="12" height="12" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                   Edit
+                </button>
+                <button class="btn-delete-listing" onclick="confirmDeletePG(${pg.pg_id}, '${pg.name.replace(/'/g, "\\'")}')">
+                  <svg width="12" height="12" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                  Delete
                 </button>
               </td>
             </tr>`;
@@ -1140,16 +1240,22 @@ async function openEditListing(id) {
     document.getElementById('el-ac').checked            = !!pg.ac;
     document.getElementById('el-parking').checked       = !!pg.parking;
 
-    // Show existing images
+    // Show existing images with delete buttons
     const imgs = pg.images || [];
     const row = document.getElementById('existingImgsRow');
     row.innerHTML = '';
     if (imgs.length) {
       imgs.forEach(img => {
         const src = img.image || img;
+        const imgId = img.id;
         const wrap = document.createElement('div');
         wrap.className = 'existing-img-wrap';
-        wrap.innerHTML = `<img src="${src}" alt="PG photo" />`;
+        wrap.id = `existing-img-${imgId}`;
+        wrap.innerHTML = `
+          <img src="${src}" alt="PG photo" />
+          <button type="button" class="img-delete-btn" onclick="deleteExistingImage(${imgId})" title="Remove photo">
+            <svg width="10" height="10" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </button>`;
         row.appendChild(wrap);
       });
     } else {
@@ -1179,11 +1285,18 @@ document.getElementById('editListingForm').addEventListener('submit', async func
     ['wifi','food','laundry','ac','parking'].forEach(f => {
       if (!fd.has(f)) fd.set(f, 'false');
     });
+
     fd.set('is_available', fd.get('is_available') === 'true' ? 'true' : 'false');
 
-    // Remove empty image field if no file selected
+    // ✅ FIXED IMAGE HANDLING
     const editImgInput = document.getElementById('editImageInput');
-    if (!editImgInput.files.length) fd.delete('images');
+    fd.delete('images'); // remove wrong field
+
+    if (editImgInput.files.length) {
+      for (let i = 0; i < editImgInput.files.length; i++) {
+        fd.append('uploaded_images', editImgInput.files[i]);
+      }
+    }
 
     const res = await fetch(`${API_BASE}/listings/${id}/`, {
       method: 'PATCH',
@@ -1316,6 +1429,59 @@ document.getElementById('listPGForm').addEventListener('submit', async function(
     btn.disabled = false;
   }
 });
+
+/* ── CONFIRM & DELETE PG ── */
+let _pendingDeleteId = null;
+
+function confirmDeletePG(id, name) {
+  _pendingDeleteId = id;
+  document.getElementById('deletePGName').textContent = `"${name}"`;
+  openModal('confirmDeleteModal');
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+  if (!_pendingDeleteId) return;
+  const btn = document.getElementById('confirmDeleteBtn');
+  btn.innerHTML = '<span class="spinner"></span> Deleting…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API_BASE}/listings/${_pendingDeleteId}/`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Token ${token()}` }
+    });
+    if (!res.ok) throw new Error();
+    closeModal('confirmDeleteModal');
+    showToast('🗑️ Listing deleted successfully.');
+    loadListings();
+  } catch {
+    showToast('❌ Failed to delete listing. Please try again.');
+  } finally {
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg> Yes, Delete';
+    btn.disabled = false;
+    _pendingDeleteId = null;
+  }
+});
+
+/* ── DELETE EXISTING IMAGE ── */
+async function deleteExistingImage(imageId) {
+  try {
+    const res = await fetch(`${API_BASE}/listings/images/${imageId}/`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Token ${token()}` }
+    });
+    if (!res.ok) throw new Error();
+    const wrap = document.getElementById(`existing-img-${imageId}`);
+    if (wrap) wrap.remove();
+    const row = document.getElementById('existingImgsRow');
+    if (row && !row.querySelector('.existing-img-wrap')) {
+      row.innerHTML = `<span style="font-size:.8rem;color:var(--muted);">No photos uploaded yet.</span>`;
+    }
+    showToast('🗑️ Photo removed.');
+  } catch {
+    showToast('❌ Could not delete photo. Please try again.');
+  }
+}
 
 /* ── INIT ── */
 document.addEventListener('DOMContentLoaded', () => {
