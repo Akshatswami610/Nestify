@@ -1044,6 +1044,13 @@ document.getElementById('openEditProfileBtn').addEventListener('click', () => op
 document.getElementById('imageInput').addEventListener('change', function() {
   const row = document.getElementById('imgPreviewRow');
   row.innerHTML = '';
+
+  if (this.files.length > 5) {
+    showToast('❌ You can upload maximum 5 images');
+    this.value = '';
+    return;
+  }
+
   Array.from(this.files).forEach(file => {
     const img = document.createElement('img');
     img.className = 'img-thumb';
@@ -1060,6 +1067,13 @@ uz.addEventListener('drop', e => { e.preventDefault(); uz.classList.remove('drag
 document.getElementById('editImageInput').addEventListener('change', function() {
   const row = document.getElementById('editImgPreviewRow');
   row.innerHTML = '';
+
+  if (this.files.length > 5) {
+    showToast('❌ You can upload maximum 5 images');
+    this.value = '';
+    return;
+  }
+
   Array.from(this.files).forEach(file => {
     const img = document.createElement('img');
     img.className = 'img-thumb';
@@ -1247,7 +1261,7 @@ async function openEditListing(id) {
     if (imgs.length) {
       imgs.forEach(img => {
         const src = img.image || img;
-        const imgId = img.id;
+        const imgId = img.image_id;
         const wrap = document.createElement('div');
         wrap.className = 'existing-img-wrap';
         wrap.id = `existing-img-${imgId}`;
