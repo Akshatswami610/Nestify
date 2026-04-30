@@ -11,13 +11,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    config('ALLOWED_HOST', default='your-app-name.azurewebsites.net')
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    f"https://{config('ALLOWED_HOST', default='your-app-name.azurewebsites.net')}"
-]
+ALLOWED_HOSTS = ['*']
 
 
 # -------------------------
@@ -48,13 +42,9 @@ INSTALLED_APPS = [
 # -------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
-    # WhiteNoise for static files
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',   # keep (important)
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -70,7 +60,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # make sure folder exists
+        'DIRS': [BASE_DIR / 'frontend'],  # optional for DRF
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,7 +78,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # -------------------------
-# DATABASE (Azure PostgreSQL)
+# DATABASE
 # -------------------------
 DATABASES = {
     'default': {
@@ -96,11 +86,8 @@ DATABASES = {
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
+        'HOST': config('DB_HOST', default='localhost'),
         'PORT': config('DB_PORT', default=5432),
-        'OPTIONS': {
-            'sslmode': 'require'
-        }
     }
 }
 
@@ -126,7 +113,7 @@ AUTH_USER_MODEL = 'accounts.User'
 # AUTHENTICATION BACKENDS
 # -------------------------
 AUTHENTICATION_BACKENDS = [
-    'accounts.backends.EmailOrPhoneBackend',
+    'accounts.backends.EmailOrPhoneBackend',   # custom login
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -136,7 +123,7 @@ AUTHENTICATION_BACKENDS = [
 # -------------------------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # IMPORTANT
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -154,7 +141,7 @@ USE_TZ = True
 
 
 # -------------------------
-# STATIC FILES (Azure + WhiteNoise)
+# STATIC & MEDIA FILES
 # -------------------------
 STATIC_URL = '/static/'
 
@@ -162,24 +149,10 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'   # for production
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-
-# -------------------------
-# MEDIA FILES
-# -------------------------
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-
-# -------------------------
-# SECURITY HEADERS
-# -------------------------
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
 
 
 # -------------------------
