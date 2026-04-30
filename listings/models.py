@@ -53,5 +53,6 @@ class PG(models.Model):
         return self.name
 
 class PGImage(models.Model):
+    image_id = models.AutoField(primary_key=True)
     pg = models.ForeignKey(PG, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='pg_images/')
