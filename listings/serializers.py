@@ -25,7 +25,7 @@ class OwnerSerializer(serializers.ModelSerializer):
 class PGImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PGImage
-        fields = ['id', 'image']
+        fields = ['image_id', 'image']
 
 
 # ─────────────────────────────
