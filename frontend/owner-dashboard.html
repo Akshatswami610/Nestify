@@ -236,6 +236,17 @@
   .pg-thumb-placeholder svg { fill: #d1d5db; }
 
   .pg-name-cell { font-weight: 600; }
+  .pg-name-link {
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color .2s;
+  }
+  .pg-name-link:hover {
+    color: var(--coral);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   .pg-city { font-size: .78rem; color: var(--muted); margin-top: 2px; }
 
   .badge {
@@ -1199,7 +1210,7 @@ async function loadListings() {
             return `
             <tr>
               <td class="pg-thumb-cell">${thumbHtml}</td>
-              <td class="pg-name-cell">${pg.name}<div class="pg-city">${pg.location || ''}</div></td>
+              <td class="pg-name-cell"><a href="/pg/${pg.pg_id}/" class="pg-name-link">${pg.name}</a><div class="pg-city">${pg.location || ''}</div></td>
               <td>${pg.city}</td>
               <td>₹${Number(pg.rent).toLocaleString('en-IN')}<br><small style="color:var(--muted);font-size:.72rem">+₹${pg.deposit || 0} dep.</small></td>
               <td>
