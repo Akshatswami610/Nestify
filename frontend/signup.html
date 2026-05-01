@@ -3,442 +3,351 @@
 
 
 <!-- ============================================================
-     STYLES  (scoped to this page only)
+     STYLES
      ============================================================ -->
 {% block extra_head %}
 <style>
 
-  /* ── Layout ──────────────────────────────────────────────── */
+  /* ── Layout ───────────────────────────────────────────────── */
   .auth-page {
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - 76px);
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
 
 
-  /* ── Left panel (illustration) ───────────────────────────── */
+  /* ── Left panel ───────────────────────────────────────────── */
   .panel-left {
     position: relative;
-    background: #1a1a2e;
+    background: var(--obsidian-2);
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    padding: 48px;
+    padding: 56px;
   }
 
   .panel-left::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background:
-      radial-gradient(ellipse 70% 60% at 70% 20%, #a78bfa55 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 20% 70%, #ff5a5f44 0%, transparent 55%),
-      radial-gradient(ellipse 80% 80% at 50% 50%, #1e2040   0%, #1a1a2e    100%);
+      radial-gradient(ellipse 60% 50% at 25% 15%, rgba(185,28,28,.22) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(212,175,106,.1) 0%, transparent 55%);
+    z-index: 0;
+  }
+
+  /* Subtle grid lines */
+  .panel-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size: 48px 48px;
     z-index: 0;
   }
 
   /* Animated blobs */
   .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: .35;
-    z-index: 0;
-    animation: blobFloat 8s ease-in-out infinite alternate;
+    position: absolute; border-radius: 50%;
+    filter: blur(72px); opacity: .3; z-index: 0;
+    animation: blobFloat 9s ease-in-out infinite alternate;
   }
-  .blob-1 { width: 300px; height: 300px; background: #7c3aed; top: -60px;  right: -60px; animation-delay:  0s; }
-  .blob-2 { width: 260px; height: 260px; background: #FF5A5F; bottom: 60px; left: -60px; animation-delay: -3s; }
-  .blob-3 { width: 180px; height: 180px; background: #ff9a6c; top: 40%;    left: 40%;   animation-delay: -5s; }
+  .blob-1 { width: 380px; height: 380px; background: var(--crimson); top: -90px; left: -90px; animation-delay: 0s; }
+  .blob-2 { width: 260px; height: 260px; background: var(--gold);    bottom: 80px; right: -60px; animation-delay: -4s; opacity: .14; }
+  .blob-3 { width: 180px; height: 180px; background: var(--crimson); top: 45%; left: 45%; animation-delay: -6s; opacity: .15; }
 
   @keyframes blobFloat {
-    from { transform: translate(0, 0)       scale(1);    }
-    to   { transform: translate(20px, 30px) scale(1.08); }
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(24px, 36px) scale(1.1); }
   }
 
-  /* Illustration wrapper */
+  /* Illustration */
   .illustration {
-    position: relative;
-    z-index: 1;
-    margin-bottom: 40px;
-    align-self: center;
+    position: relative; z-index: 1;
+    margin-bottom: 48px; align-self: center;
   }
 
   /* Copy block */
-  .panel-copy {
-    position: relative;
-    z-index: 1;
+  .panel-copy { position: relative; z-index: 1; }
+
+  .panel-eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: .63rem; font-weight: 700; letter-spacing: .2em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
   }
+  .panel-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--gold); opacity: .5; }
 
   .panel-copy h1 {
-    font-family: 'Fraunces', serif;
-    font-weight: 300;
-    font-size: 2.2rem;
-    line-height: 1.2;
-    color: #fff;
-    margin-bottom: 12px;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300; font-size: 2.6rem; line-height: 1.18;
+    color: #fff; margin-bottom: 14px; letter-spacing: -.01em;
   }
-
-  .panel-copy h1 em {
-    font-style: italic;
-    color: #c4b5fd;
-  }
-
+  .panel-copy h1 em { font-style: italic; color: var(--gold); }
   .panel-copy p {
-    font-size: .93rem;
-    color: rgba(255, 255, 255, .55);
-    max-width: 320px;
-    line-height: 1.6;
+    font-size: .88rem; color: rgba(255,255,255,.45);
+    max-width: 320px; line-height: 1.7;
   }
 
-  /* Perk list */
-  .perks {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 28px;
-  }
-
+  /* Perks */
+  .perks { display: flex; flex-direction: column; gap: 11px; margin-top: 26px; }
   .perk {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: rgba(255, 255, 255, .8);
-    font-size: .875rem;
+    display: flex; align-items: center; gap: 13px;
+    color: rgba(255,255,255,.72); font-size: .82rem;
+    animation: fadeSlide .5s var(--ease) both;
+  }
+  .perk:nth-child(1) { animation-delay: .05s; }
+  .perk:nth-child(2) { animation-delay: .12s; }
+  .perk:nth-child(3) { animation-delay: .19s; }
+  .perk:nth-child(4) { animation-delay: .26s; }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(-14px); }
+    to   { opacity: 1; transform: translateX(0); }
   }
 
   .perk-icon {
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    background: rgba(255, 255, 255, .08);
-    border: 1px solid rgba(255, 255, 255, .14);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
+    flex-shrink: 0; width: 34px; height: 34px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+    transition: background .2s, border-color .2s, transform .2s var(--ease-spring);
+  }
+  .perk:hover .perk-icon {
+    background: rgba(212,175,106,.15);
+    border-color: rgba(212,175,106,.3);
+    transform: scale(1.08) rotate(-4deg);
   }
 
 
-  /* ── Right panel (form card) ──────────────────────────────── */
+  /* ── Right panel ──────────────────────────────────────────── */
   .panel-right {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 24px;
-    background: #f9f7f5;
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px 28px; background: var(--silk);
     overflow-y: auto;
   }
 
   .card {
-    width: 100%;
-    max-width: 440px;
-    padding: 44px;
-    background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, .10);
-    animation: cardSlideUp .5s cubic-bezier(.16, 1, .3, 1) both;
+    width: 100%; max-width: 440px;
+    padding: 48px 44px;
+    background: #fff; border-radius: 28px;
+    box-shadow: 0 4px 6px rgba(0,0,0,.04), 0 24px 60px rgba(0,0,0,.09);
+    border: 1px solid var(--border-light);
+    animation: cardUp .55s var(--ease) .08s both;
   }
-
-  @keyframes cardSlideUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0);    }
+  @keyframes cardUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
   /* Owner badge */
   .owner-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 5px 12px;
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 13px;
+    background: rgba(185,28,28,.07);
+    border: 1px solid rgba(185,28,28,.15);
     border-radius: 100px;
-    color: #c2410c;
-    font-size: .75rem;
-    font-weight: 600;
-    margin-bottom: 16px;
+    color: var(--crimson);
+    font-size: .68rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .owner-badge span {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--crimson);
   }
 
   .card-title {
-    font-family: 'Fraunces', serif;
-    font-size: 1.7rem;
-    font-weight: 400;
-    color: #1a1a2e;
-    margin-bottom: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.05rem; font-weight: 500;
+    color: var(--obsidian); margin-bottom: 4px; letter-spacing: -.02em;
   }
-
   .card-sub {
-    font-size: .875rem;
-    color: #6b7280;
-    margin-bottom: 28px;
+    font-size: .83rem; color: var(--muted);
+    margin-bottom: 30px; line-height: 1.6;
   }
 
 
   /* ── Form fields ──────────────────────────────────────────── */
-  .field {
-    margin-bottom: 14px;
-  }
+  .field { margin-bottom: 16px; }
 
   .field label {
-    display: block;
-    font-size: .75rem;
-    font-weight: 600;
-    color: #1a1a2e;
-    margin-bottom: 5px;
-    letter-spacing: .04em;
-    text-transform: uppercase;
+    display: block; font-size: .68rem; font-weight: 700;
+    color: var(--obsidian); margin-bottom: 7px;
+    letter-spacing: .1em; text-transform: uppercase;
   }
 
-  .input-wrap {
-    position: relative;
-  }
+  .input-wrap { position: relative; }
 
-  /* Left icon inside input */
-  .input-wrap .field-icon {
-    position: absolute;
-    left: 13px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #b0b7c3;
-    display: flex;
-    align-items: center;
-    pointer-events: none;
-    transition: color .2s;
+  .field-icon {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: #C4C4D4; display: flex; align-items: center;
+    pointer-events: none; transition: color .2s;
   }
 
   .input-wrap input {
     width: 100%;
-    padding: 12px 13px 12px 40px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 12px;
-    font-size: .93rem;
-    font-family: 'DM Sans', sans-serif;
-    color: #1a1a2e;
-    background: #fafafa;
+    padding: 13px 14px 13px 43px;
+    border: 1.5px solid var(--border-light); border-radius: 14px;
+    font-size: .88rem; font-family: 'DM Sans', sans-serif;
+    color: var(--obsidian); background: var(--silk);
     outline: none;
     transition: border-color .2s, box-shadow .2s, background .2s;
   }
-
-  .input-wrap input::placeholder {
-    color: #b0b7c3;
-  }
-
+  .input-wrap input::placeholder { color: #B8B8CC; }
   .input-wrap input:focus {
-    border-color: #FF5A5F;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(255, 90, 95, .10);
+    border-color: var(--crimson); background: #fff;
+    box-shadow: 0 0 0 4px rgba(185,28,28,.09);
   }
-
-  .input-wrap input:focus ~ .field-icon {
-    color: #FF5A5F;
-  }
+  .input-wrap:focus-within .field-icon { color: var(--crimson); }
 
   /* Password toggle */
   .pwd-toggle {
-    position: absolute;
-    right: 13px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #b0b7c3;
-    display: flex;
-    align-items: center;
+    position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    color: #C4C4D4; display: flex; align-items: center;
     transition: color .2s;
   }
+  .pwd-toggle:hover { color: var(--crimson); }
 
-  .pwd-toggle:hover {
-    color: #FF5A5F;
-  }
-
-  /* Inline field hint */
+  /* Field hint */
   .field-hint {
-    margin-top: 5px;
-    font-size: .72rem;
-    color: #9ca3af;
+    margin-top: 5px; font-size: .71rem; color: var(--muted-l);
+    line-height: 1.5;
   }
 
 
   /* ── Password strength meter ──────────────────────────────── */
   .strength-track {
-    display: flex;
-    gap: 4px;
-    margin-top: 6px;
+    display: flex; gap: 5px; margin-top: 8px;
   }
-
   .strength-seg {
-    flex: 1;
-    height: 3px;
-    border-radius: 2px;
-    background: #e5e7eb;
-    transition: background .3s;
+    flex: 1; height: 3px; border-radius: 10px;
+    background: var(--border-light);
+    transition: background .35s var(--ease);
   }
-
   .strength-label {
-    margin-top: 4px;
-    font-size: .72rem;
-    color: #6b7280;
+    margin-top: 5px; font-size: .71rem; color: var(--muted);
+    font-weight: 500; min-height: 1.1em;
+    transition: color .3s;
   }
 
 
   /* ── Terms checkbox ───────────────────────────────────────── */
   .terms-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin: 16px 0;
+    display: flex; align-items: flex-start;
+    gap: 11px; margin: 18px 0;
   }
 
   .terms-row input[type="checkbox"] {
-    accent-color: #FF5A5F;
-    width: 15px;
-    height: 15px;
-    margin-top: 2px;
-    flex-shrink: 0;
-    cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px;
+    border: 1.5px solid var(--border-light); border-radius: 5px;
+    background: var(--silk); cursor: pointer;
+    transition: background .2s, border-color .2s, box-shadow .2s;
+    position: relative;
+  }
+  .terms-row input[type="checkbox"]:checked {
+    background: var(--crimson); border-color: var(--crimson);
+    box-shadow: 0 2px 8px rgba(185,28,28,.3);
+  }
+  .terms-row input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute; top: 2px; left: 5px;
+    width: 5px; height: 9px;
+    border: 2px solid #fff;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+  .terms-row input[type="checkbox"]:focus {
+    outline: none; box-shadow: 0 0 0 3px rgba(185,28,28,.12);
   }
 
   .terms-row label {
-    font-size: .82rem;
-    color: #6b7280;
-    line-height: 1.5;
-    cursor: pointer;
+    font-size: .8rem; color: var(--muted); line-height: 1.55; cursor: pointer;
   }
-
   .terms-row label a {
-    color: #FF5A5F;
-    font-weight: 500;
-    text-decoration: none;
+    color: var(--crimson); font-weight: 600; text-decoration: none;
   }
-
-  .terms-row label a:hover {
-    text-decoration: underline;
-  }
+  .terms-row label a:hover { text-decoration: underline; }
 
 
   /* ── Feedback messages ────────────────────────────────────── */
   .error-msg,
   .success-msg {
-    display: none;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 14px;
-    border-radius: 10px;
-    font-size: .83rem;
-    margin-bottom: 14px;
+    display: none; align-items: center; gap: 9px;
+    padding: 12px 15px; border-radius: 12px;
+    font-size: .8rem; margin-bottom: 16px;
   }
-
   .error-msg {
-    background: #fff1f1;
-    border: 1px solid #ffc5c5;
-    color: #c0392b;
+    background: #FFF1F1; border: 1px solid #FFCBCB; color: #B91C1C;
   }
-
   .error-msg.visible {
     display: flex;
     animation: shake .35s ease;
   }
-
   .success-msg {
-    background: #f0fdf4;
-    border: 1px solid #86efac;
-    color: #166534;
+    background: #F0FDF4; border: 1px solid #86EFAC; color: #166534;
   }
-
-  .success-msg.visible {
-    display: flex;
-  }
+  .success-msg.visible { display: flex; }
 
   @keyframes shake {
-    0%, 100% { transform: translateX(0);    }
-    25%       { transform: translateX(-6px); }
-    75%       { transform: translateX(6px);  }
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-6px); }
+    75%      { transform: translateX(6px); }
   }
 
 
   /* ── Submit button ────────────────────────────────────────── */
   .btn-primary {
-    width: 100%;
-    padding: 14px;
-    background: #FF5A5F;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    width: 100%; padding: 15px;
+    background: var(--crimson); color: #fff; border: none;
+    border-radius: 14px; font-size: .92rem; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
     transition: background .2s, transform .15s, box-shadow .2s;
-    box-shadow: 0 4px 16px rgba(255, 90, 95, .30);
+    box-shadow: 0 6px 22px var(--crimson-glow);
+    position: relative; overflow: hidden;
   }
-
+  .btn-primary::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.15) 0%, transparent 60%);
+  }
   .btn-primary:hover:not(:disabled) {
-    background: #e04a4f;
-    transform: translateY(-1px);
-    box-shadow: 0 8px 24px rgba(255, 90, 95, .35);
+    background: var(--crimson-d); transform: translateY(-2px);
+    box-shadow: 0 10px 30px var(--crimson-glow);
   }
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
+  .btn-primary:disabled { opacity: .65; cursor: not-allowed; }
 
-  .btn-primary:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  .btn-primary:disabled {
-    opacity: .7;
-    cursor: not-allowed;
-  }
-
-  /* Spinner inside button */
+  /* Spinner */
   .spinner {
-    display: none;
-    width: 18px;
-    height: 18px;
-    border: 2px solid rgba(255, 255, 255, .40);
-    border-top-color: #fff;
-    border-radius: 50%;
-    animation: spin .7s linear infinite;
+    display: none; width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,.35); border-top-color: #fff;
+    border-radius: 50%; animation: spin .7s linear infinite;
   }
-
   .btn-primary.loading .spinner   { display: block; }
-  .btn-primary.loading .btn-label { display: none;  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  .btn-primary.loading .btn-label { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
 
-  /* ── Bottom link ──────────────────────────────────────────── */
+  /* ── Bottom auth link ─────────────────────────────────────── */
   .auth-link {
-    text-align: center;
-    margin-top: 18px;
-    font-size: .875rem;
-    color: #6b7280;
+    text-align: center; margin-top: 22px;
+    font-size: .82rem; color: var(--muted);
   }
-
   .auth-link a {
-    color: #FF5A5F;
-    font-weight: 600;
-    text-decoration: none;
-    transition: opacity .2s;
+    color: var(--crimson); font-weight: 600;
+    text-decoration: none; transition: opacity .2s;
   }
-
-  .auth-link a:hover {
-    opacity: .8;
-  }
+  .auth-link a:hover { opacity: .8; }
 
 
   /* ── Responsive ───────────────────────────────────────────── */
   @media (max-width: 768px) {
     .auth-page   { grid-template-columns: 1fr; }
     .panel-left  { display: none; }
-    .panel-right { padding: 24px 16px; min-height: calc(100vh - 64px); }
-    .card        { padding: 32px 20px; }
+    .panel-right { padding: 24px 16px; min-height: calc(100vh - 76px); }
+    .card        { padding: 36px 24px; }
   }
 
 </style>
@@ -453,63 +362,116 @@
 
   <!-- ── Left panel ── -->
   <div class="panel-left">
-
+    <div class="panel-grid"></div>
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
     <div class="blob blob-3"></div>
 
-    <!-- House illustration -->
+    <!-- House / city illustration -->
     <div class="illustration">
-      <svg width="280" height="220" viewBox="0 0 280 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- House body -->
-        <path d="M140 30 L240 100 L220 100 L220 190 L60 190 L60 100 L40 100 Z" fill="#221833" opacity=".95"/>
-        <!-- Roof shade -->
-        <path d="M140 30 L240 100 L220 100 L140 50 L60 100 L40 100 Z" fill="#2d1b3d" opacity=".9"/>
+      <svg width="300" height="240" viewBox="0 0 300 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="150" cy="226" rx="130" ry="12" fill="rgba(185,28,28,.1)"/>
+
+        <!-- Background buildings -->
+        <rect x="14" y="70" width="44" height="158" rx="3" fill="#1A1A26" opacity=".8"/>
+        <rect x="22" y="84"  width="8" height="10" rx="2" fill="rgba(212,175,106,.55)"/>
+        <rect x="38" y="84"  width="8" height="10" rx="2" fill="rgba(212,175,106,.3)"/>
+        <rect x="22" y="104" width="8" height="10" rx="2" fill="rgba(212,175,106,.7)"/>
+        <rect x="38" y="104" width="8" height="10" rx="2" fill="rgba(212,175,106,.4)"/>
+        <rect x="22" y="124" width="8" height="10" rx="2" fill="rgba(212,175,106,.35)"/>
+        <rect x="38" y="124" width="8" height="10" rx="2" fill="rgba(212,175,106,.6)"/>
+        <rect x="22" y="144" width="8" height="10" rx="2" fill="rgba(212,175,106,.8)"/>
+        <rect x="38" y="144" width="8" height="10" rx="2" fill="rgba(212,175,106,.3)"/>
+
+        <rect x="242" y="88" width="50" height="140" rx="3" fill="#1E1E2C" opacity=".85"/>
+        <rect x="252" y="102" width="8" height="10" rx="2" fill="rgba(212,175,106,.6)"/>
+        <rect x="268" y="102" width="8" height="10" rx="2" fill="rgba(212,175,106,.35)"/>
+        <rect x="252" y="122" width="8" height="10" rx="2" fill="rgba(212,175,106,.8)"/>
+        <rect x="268" y="122" width="8" height="10" rx="2" fill="rgba(212,175,106,.5)"/>
+        <rect x="252" y="142" width="8" height="10" rx="2" fill="rgba(212,175,106,.4)"/>
+        <rect x="268" y="142" width="8" height="10" rx="2" fill="rgba(212,175,106,.7)"/>
+        <rect x="252" y="162" width="8" height="10" rx="2" fill="rgba(212,175,106,.3)"/>
+
+        <!-- Central building -->
+        <rect x="96" y="34" width="108" height="194" rx="4" fill="#20182A" opacity=".97"/>
+        <!-- Gold top accent -->
+        <rect x="96" y="34" width="108" height="3" rx="1" fill="url(#gGrad)"/>
+        <defs>
+          <linearGradient id="gGrad" x1="96" y1="0" x2="204" y2="0" gradientUnits="userSpaceOnUse">
+            <stop stop-color="rgba(185,28,28,.5)"/>
+            <stop offset=".5" stop-color="#D4AF6A"/>
+            <stop offset="1" stop-color="rgba(185,28,28,.5)"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Windows -->
+        <rect x="108" y="52"  width="12" height="15" rx="2" fill="rgba(212,175,106,.8)"/>
+        <rect x="128" y="52"  width="12" height="15" rx="2" fill="rgba(212,175,106,.4)"/>
+        <rect x="148" y="52"  width="12" height="15" rx="2" fill="rgba(212,175,106,.95)"/>
+        <rect x="168" y="52"  width="12" height="15" rx="2" fill="rgba(212,175,106,.5)"/>
+
+        <rect x="108" y="80"  width="12" height="15" rx="2" fill="rgba(212,175,106,.5)"/>
+        <rect x="128" y="80"  width="12" height="15" rx="2" fill="rgba(212,175,106,.85)"/>
+        <rect x="148" y="80"  width="12" height="15" rx="2" fill="rgba(212,175,106,.4)"/>
+        <rect x="168" y="80"  width="12" height="15" rx="2" fill="rgba(212,175,106,.65)"/>
+
+        <rect x="108" y="108" width="12" height="15" rx="2" fill="rgba(212,175,106,.9)"/>
+        <rect x="128" y="108" width="12" height="15" rx="2" fill="rgba(212,175,106,.3)"/>
+        <rect x="148" y="108" width="12" height="15" rx="2" fill="rgba(212,175,106,.75)"/>
+        <rect x="168" y="108" width="12" height="15" rx="2" fill="rgba(212,175,106,.5)"/>
+
+        <rect x="108" y="136" width="12" height="15" rx="2" fill="rgba(212,175,106,.4)"/>
+        <rect x="148" y="136" width="12" height="15" rx="2" fill="rgba(212,175,106,.9)"/>
+        <rect x="168" y="136" width="12" height="15" rx="2" fill="rgba(212,175,106,.3)"/>
+
         <!-- Door -->
-        <rect x="112" y="140" width="36" height="50" rx="4" fill="#FF5A5F" opacity=".7"/>
-        <circle cx="144" cy="166" r="3" fill="rgba(255,255,255,.6)"/>
-        <!-- Left window -->
-        <rect x="72" y="115" width="36" height="30" rx="4"
-              fill="rgba(255,203,119,.25)" stroke="rgba(255,203,119,.4)" stroke-width="1.5"/>
-        <line x1="90" y1="115" x2="90" y2="145" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
-        <line x1="72" y1="130" x2="108" y2="130" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
-        <!-- Right window -->
-        <rect x="172" y="115" width="36" height="30" rx="4"
-              fill="rgba(255,203,119,.35)" stroke="rgba(255,203,119,.4)" stroke-width="1.5"/>
-        <line x1="190" y1="115" x2="190" y2="145" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
-        <line x1="172" y1="130" x2="208" y2="130" stroke="rgba(255,203,119,.4)" stroke-width="1"/>
-        <!-- Chimney -->
-        <rect x="185" y="45" width="16" height="30" rx="2" fill="#2a2040"/>
-        <!-- Smoke puffs -->
-        <circle cx="193" cy="38" r="5" fill="rgba(255,255,255,.06)"/>
-        <circle cx="197" cy="28" r="7" fill="rgba(255,255,255,.05)"/>
-        <circle cx="190" cy="18" r="9" fill="rgba(255,255,255,.04)"/>
-        <!-- Ground glow -->
-        <ellipse cx="140" cy="195" rx="50" ry="8" fill="rgba(255,90,95,.12)"/>
+        <rect x="138" y="194" width="24" height="34" rx="3" fill="rgba(185,28,28,.6)"/>
+        <circle cx="158" cy="212" r="2.5" fill="rgba(212,175,106,.85)"/>
+
+        <!-- Ground -->
+        <rect x="60" y="228" width="180" height="1.5" rx="1" fill="rgba(255,255,255,.055)"/>
+
+        <!-- Key icon circle — accent -->
+        <circle cx="256" cy="56" r="20" fill="rgba(185,28,28,.12)" stroke="rgba(185,28,28,.25)" stroke-width="1"/>
+        <circle cx="249" cy="56" r="7" stroke="#D4AF6A" stroke-width="1.8" fill="none"/>
+        <line x1="256" y1="56" x2="268" y2="56" stroke="#D4AF6A" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="265" y1="53" x2="265" y2="56" stroke="#D4AF6A" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="268" y1="53" x2="268" y2="56" stroke="#D4AF6A" stroke-width="1.8" stroke-linecap="round"/>
+
         <!-- Stars -->
-        <circle cx="30"  cy="25" r="1.5" fill="#fff" opacity=".5"/>
-        <circle cx="80"  cy="15" r="1"   fill="#fff" opacity=".4"/>
-        <circle cx="200" cy="20" r="1.5" fill="#fff" opacity=".6"/>
-        <circle cx="255" cy="40" r="1"   fill="#fff" opacity=".5"/>
-        <!-- Key circle accent -->
-        <circle cx="240" cy="170" r="22" fill="rgba(255,90,95,.15)" stroke="rgba(255,90,95,.3)" stroke-width="1"/>
-        <path d="M233 170a7 7 0 1 1 7 7 7 7 0 0 1-7-7zm12 0h10m-3-3v6"
-              stroke="#FF9A8B" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <circle cx="48"  cy="24" r="1.5" fill="#fff" opacity=".5"/>
+        <circle cx="88"  cy="14" r="1"   fill="#fff" opacity=".45"/>
+        <circle cx="214" cy="20" r="1.5" fill="#fff" opacity=".6"/>
+        <circle cx="276" cy="36" r="1"   fill="#fff" opacity=".4"/>
+        <circle cx="292" cy="14" r="2"   fill="#fff" opacity=".3"/>
       </svg>
     </div>
 
     <!-- Marketing copy -->
     <div class="panel-copy">
+      <div class="panel-eyebrow">Owner Registration</div>
       <h1>List or <em>grow</em> your<br>PG business today.</h1>
       <p>Join thousands of owners already managing their properties on Nestify.</p>
+
       <div class="perks">
-        <div class="perk"><div class="perk-icon">📋</div> Easy listing management</div>
-        <div class="perk"><div class="perk-icon">🛡️</div> Verified tenant matching</div>
-        <div class="perk"><div class="perk-icon">💬</div> Direct chat — zero brokerage</div>
-        <div class="perk"><div class="perk-icon">⚡</div> Get enquiries within minutes</div>
+        <div class="perk">
+          <div class="perk-icon">📋</div>
+          Easy listing management
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🛡️</div>
+          Verified tenant matching
+        </div>
+        <div class="perk">
+          <div class="perk-icon">💬</div>
+          Direct chat — zero brokerage
+        </div>
+        <div class="perk">
+          <div class="perk-icon">⚡</div>
+          Get enquiries within minutes
+        </div>
       </div>
     </div>
-
   </div><!-- /panel-left -->
 
 
@@ -517,26 +479,22 @@
   <div class="panel-right">
     <div class="card">
 
-      <!-- Owner badge -->
-      <div class="owner-badge">
-        🏢 Owner Registration
-      </div>
+      <div class="owner-badge"><span></span>Owner Registration</div>
 
       <h2 class="card-title">Create account</h2>
       <p class="card-sub">Register your PG business — it's free.</p>
 
       <!-- Error banner -->
       <div class="error-msg" id="js-error-msg" role="alert" aria-live="polite">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-                   10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
         </svg>
         <span id="js-error-text"></span>
       </div>
 
       <!-- Success banner -->
       <div class="success-msg" id="js-success-msg" role="status" aria-live="polite">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
         </svg>
         <span>Account created! Redirecting to your dashboard…</span>
@@ -551,12 +509,9 @@
           <label for="company_name">Company / PG Name</label>
           <div class="input-wrap">
             <input
-              type="text"
-              id="company_name"
-              name="company_name"
+              type="text" id="company_name" name="company_name"
               placeholder="e.g. Sharma PG Services"
-              autocomplete="organization"
-              required
+              autocomplete="organization" required
             />
             <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
@@ -570,16 +525,12 @@
           <label for="email">Email Address</label>
           <div class="input-wrap">
             <input
-              type="email"
-              id="email"
-              name="email"
+              type="email" id="email" name="email"
               placeholder="you@company.com"
-              autocomplete="email"
-              required
+              autocomplete="email" required
             />
             <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16
-                       c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
             </svg>
           </div>
         </div>
@@ -589,19 +540,12 @@
           <label for="phone_number">Phone Number</label>
           <div class="input-wrap">
             <input
-              type="tel"
-              id="phone_number"
-              name="phone_number"
+              type="tel" id="phone_number" name="phone_number"
               placeholder="9876543210"
-              autocomplete="tel"
-              maxlength="10"
-              required
+              autocomplete="tel" maxlength="10" required
             />
             <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2
-                       1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1
-                       -9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1
-                       0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
+              <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/>
             </svg>
           </div>
         </div>
@@ -611,25 +555,16 @@
           <label for="password">Password</label>
           <div class="input-wrap">
             <input
-              type="password"
-              id="password"
-              name="password"
+              type="password" id="password" name="password"
               placeholder="Min. 8 characters"
-              autocomplete="new-password"
-              required
+              autocomplete="new-password" required
             />
             <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6
-                       c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10
-                       c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z
-                       m3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+              <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
             </svg>
-            <button type="button" class="pwd-toggle" id="js-pwd-toggle" aria-label="Toggle password visibility">
+            <button type="button" class="pwd-toggle" id="js-pwd-toggle" aria-label="Show password">
               <svg id="js-eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5
-                         s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z
-                         M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z
-                         m0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
               </svg>
             </button>
           </div>
@@ -657,9 +592,8 @@
         <!-- Submit -->
         <button type="submit" class="btn-primary" id="js-signup-btn">
           <span class="spinner" aria-hidden="true"></span>
-          <span class="btn-label">Create My Account</span>
+          <span class="btn-label">Create My Account →</span>
         </button>
-
       </form>
 
       <p class="auth-link">
@@ -674,22 +608,21 @@
 
 
 <!-- ============================================================
-     JAVASCRIPT
+     JAVASCRIPT  (original logic — untouched)
      ============================================================ -->
 {% block extra_scripts %}
 <script>
 
   /* ── Element refs ─────────────────────────────────────────── */
-  const signupForm   = document.getElementById('js-signup-form');
-  const signupBtn    = document.getElementById('js-signup-btn');
-  const errorBanner  = document.getElementById('js-error-msg');
-  const errorText    = document.getElementById('js-error-text');
-  const successBanner= document.getElementById('js-success-msg');
-  const pwdInput     = document.getElementById('password');
-  const pwdToggle    = document.getElementById('js-pwd-toggle');
-  const eyeIcon      = document.getElementById('js-eye-icon');
+  const signupForm    = document.getElementById('js-signup-form');
+  const signupBtn     = document.getElementById('js-signup-btn');
+  const errorBanner   = document.getElementById('js-error-msg');
+  const errorText     = document.getElementById('js-error-text');
+  const successBanner = document.getElementById('js-success-msg');
+  const pwdInput      = document.getElementById('password');
+  const pwdToggle     = document.getElementById('js-pwd-toggle');
+  const eyeIcon       = document.getElementById('js-eye-icon');
 
-  /* Strength segments */
   const strengthSegs  = ['js-s1','js-s2','js-s3','js-s4'].map(id => document.getElementById(id));
   const strengthLabel = document.getElementById('js-strength-label');
 
@@ -701,7 +634,6 @@
              M12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z
              m0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
   `;
-
   const EYE_SHUT = `
     <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92
              c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5
@@ -747,16 +679,15 @@
     return match ? match.pop() : '';
   }
 
-  /* Parse DRF error response into a readable string */
   function parseDrfError(data) {
     return (
-      data?.company_name?.[0]   ||
-      data?.email?.[0]          ||
-      data?.phone_number?.[0]   ||
-      data?.password?.[0]       ||
+      data?.company_name?.[0]     ||
+      data?.email?.[0]            ||
+      data?.phone_number?.[0]     ||
+      data?.password?.[0]         ||
       data?.non_field_errors?.[0] ||
-      data?.detail              ||
-      data?.message             ||
+      data?.detail                ||
+      data?.message               ||
       'Registration failed. Please try again.'
     );
   }
@@ -776,19 +707,19 @@
     const value = pwdInput.value;
     let score   = 0;
 
-    if (value.length >= 8)             score++;
-    if (/[A-Z]/.test(value))           score++;
-    if (/[0-9]/.test(value))           score++;
-    if (/[^A-Za-z0-9]/.test(value))    score++;
+    if (value.length >= 8)          score++;
+    if (/[A-Z]/.test(value))        score++;
+    if (/[0-9]/.test(value))        score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
 
-    const color = STRENGTH_COLORS[score - 1] || '#e5e7eb';
+    const color = STRENGTH_COLORS[score - 1] || 'var(--border-light)';
 
-    strengthSegs.forEach((seg, index) => {
-      seg.style.background = index < score ? color : '#e5e7eb';
+    strengthSegs.forEach((seg, i) => {
+      seg.style.background = i < score ? color : 'var(--border-light)';
     });
 
-    strengthLabel.textContent  = value.length ? (STRENGTH_LABELS[score - 1] || '') : '';
-    strengthLabel.style.color  = color;
+    strengthLabel.textContent = value.length ? (STRENGTH_LABELS[score - 1] || '') : '';
+    strengthLabel.style.color = color;
   });
 
 
@@ -797,7 +728,6 @@
     e.preventDefault();
     hideMessages();
 
-    /* Collect values */
     const companyName  = document.getElementById('company_name').value.trim();
     const email        = document.getElementById('email').value.trim();
     const phoneNumber  = document.getElementById('phone_number').value.trim();
@@ -835,14 +765,8 @@
       return;
     }
 
-    /* ── API payload ──
-       Fields must match RegisterSerializer exactly:
-       id, username, email, password, phone_number
-       We send company_name as username since the serializer uses that field.
-       Adjust the key name below if your backend has a dedicated company_name field.
-    ── */
     const payload = {
-      company_name     : companyName,   // stored as the owner's display name / company name
+      company_name : companyName,
       email        : email,
       phone_number : phoneNumber,
       password     : password,
@@ -863,14 +787,12 @@
       const data = await response.json();
 
       if (response.ok || response.status === 201) {
-        /* Store tokens */
         if (data.token)   localStorage.setItem('nestify_token',   data.token);
         if (data.access)  localStorage.setItem('nestify_token',   data.access);
         if (data.refresh) localStorage.setItem('nestify_refresh', data.refresh);
 
         showSuccess();
 
-        /* Redirect after brief success flash */
         setTimeout(() => {
           window.location.href = '/owner-dashboard/';
         }, 1200);
