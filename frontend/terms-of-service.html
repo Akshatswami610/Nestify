@@ -1,10 +1,467 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Terms of Service – Nestify{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ── PAGE HERO ── */
+  .legal-hero {
+    background: linear-gradient(135deg, var(--obsidian) 0%, var(--obsidian-2) 100%);
+    padding: 72px 32px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .legal-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, var(--crimson-glow) 0%, transparent 70%);
+  }
+  .legal-hero::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--crimson), var(--gold), var(--crimson), transparent);
+    opacity: .45;
+  }
+  .legal-hero-content { position: relative; z-index: 1; }
+  .legal-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: .72rem; font-weight: 700;
+    color: var(--gold);
+    letter-spacing: .14em; text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: fadeUp .6s var(--ease) .1s both;
+  }
+  .legal-badge span {
+    width: 6px; height: 6px;
+    background: var(--crimson); border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 8px var(--crimson-glow);
+  }
+  .legal-hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 600; color: #fff;
+    letter-spacing: -.02em; line-height: 1.12;
+    margin-bottom: 14px;
+    animation: fadeUp .6s var(--ease) .2s both;
+  }
+  .legal-hero p {
+    font-size: .92rem;
+    color: rgba(255,255,255,.45);
+    animation: fadeUp .6s var(--ease) .3s both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── LAYOUT ── */
+  .legal-layout {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 64px 32px 96px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR TOC ── */
+  .legal-toc {
+    position: sticky;
+    top: 96px;
+    background: var(--card-light);
+    border: 1px solid var(--border-light);
+    border-radius: 18px;
+    padding: 24px 20px;
+    animation: fadeUp .6s var(--ease) .15s both;
+  }
+  .legal-toc h3 {
+    font-size: .68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .16em;
+    color: var(--muted); margin-bottom: 16px;
+  }
+  .legal-toc a {
+    display: block;
+    text-decoration: none;
+    font-size: .8rem; font-weight: 500;
+    color: var(--muted);
+    padding: 7px 10px;
+    border-radius: 8px;
+    transition: color .2s, background .2s, padding-left .2s;
+    line-height: 1.4;
+  }
+  .legal-toc a:hover {
+    color: var(--crimson);
+    background: var(--crimson-l);
+    padding-left: 14px;
+  }
+  .legal-toc a.active {
+    color: var(--crimson);
+    background: var(--crimson-l);
+    font-weight: 600;
+  }
+
+  /* ── CONTENT ── */
+  .legal-content {
+    animation: fadeUp .6s var(--ease) .25s both;
+  }
+  .legal-meta {
+    display: flex; align-items: center; gap: 10px;
+    font-size: .78rem; color: var(--muted);
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+  }
+  .legal-meta .dot { width: 4px; height: 4px; background: var(--muted-l); border-radius: 50%; }
+
+  .legal-section {
+    margin-bottom: 52px;
+    scroll-margin-top: 100px;
+  }
+  .legal-section h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.65rem; font-weight: 600;
+    color: var(--obsidian);
+    letter-spacing: -.02em;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--border-light);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-num {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .72rem; font-weight: 700;
+    color: var(--crimson);
+    background: var(--crimson-l);
+    border-radius: 6px;
+    padding: 3px 8px;
+    letter-spacing: .04em;
+    flex-shrink: 0;
+  }
+  .legal-section p {
+    font-size: .9rem;
+    color: #3a3a4a;
+    line-height: 1.82;
+    margin-bottom: 14px;
+  }
+  .legal-section ul, .legal-section ol {
+    padding-left: 20px;
+    margin-bottom: 14px;
+  }
+  .legal-section li {
+    font-size: .9rem;
+    color: #3a3a4a;
+    line-height: 1.82;
+    margin-bottom: 6px;
+  }
+  .legal-section h3 {
+    font-size: .95rem; font-weight: 700;
+    color: var(--obsidian);
+    margin: 22px 0 8px;
+    letter-spacing: -.01em;
+  }
+
+  /* Highlight box */
+  .legal-highlight {
+    background: var(--gold-l);
+    border: 1px solid var(--gold-dim);
+    border-left: 3px solid var(--gold);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: .88rem;
+    color: var(--obsidian);
+    line-height: 1.72;
+  }
+  .legal-highlight strong { color: var(--obsidian); }
+
+  /* Warning box */
+  .legal-warning {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 3px solid var(--crimson);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: .88rem;
+    color: #7f1d1d;
+    line-height: 1.72;
+  }
+
+  /* Contact card */
+  .legal-contact-card {
+    background: var(--obsidian-3);
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin-top: 20px;
+    display: flex; align-items: flex-start; gap: 20px;
+  }
+  .legal-contact-icon {
+    width: 46px; height: 46px;
+    background: var(--crimson-l);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .legal-contact-icon svg { fill: var(--crimson); }
+  .legal-contact-card h3 {
+    font-size: .95rem; font-weight: 600; color: #fff;
+    margin-bottom: 6px;
+  }
+  .legal-contact-card p { font-size: .84rem; color: rgba(255,255,255,.5); line-height: 1.65; margin: 0; }
+  .legal-contact-card a { color: var(--gold); text-decoration: none; }
+  .legal-contact-card a:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .legal-layout { grid-template-columns: 1fr; gap: 32px; padding: 40px 24px 72px; }
+    .legal-toc { position: static; }
+  }
+  @media (max-width: 600px) {
+    .legal-hero { padding: 52px 20px 60px; }
+    .legal-layout { padding: 32px 20px 60px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="legal-hero">
+  <div class="legal-hero-content">
+    <div class="legal-badge"><span></span>Legal</div>
+    <h1>Terms of Service</h1>
+    <p>Please read these terms carefully before using Nestify.</p>
+  </div>
+</section>
+
+<div class="legal-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="legal-toc" id="toc">
+    <h3>Contents</h3>
+    <a href="#acceptance">1. Acceptance of Terms</a>
+    <a href="#definitions">2. Definitions</a>
+    <a href="#eligibility">3. Eligibility</a>
+    <a href="#accounts">4. User Accounts</a>
+    <a href="#listings">5. Listings & Content</a>
+    <a href="#conduct">6. Prohibited Conduct</a>
+    <a href="#payments">7. Payments & Fees</a>
+    <a href="#ip">8. Intellectual Property</a>
+    <a href="#disclaimer">9. Disclaimers</a>
+    <a href="#liability">10. Limitation of Liability</a>
+    <a href="#termination">11. Termination</a>
+    <a href="#governing">12. Governing Law</a>
+    <a href="#changes">13. Changes to Terms</a>
+    <a href="#contact-terms">14. Contact Us</a>
+  </aside>
+
+  <!-- Main Content -->
+  <article class="legal-content">
+
+    <div class="legal-meta">
+      <span>Effective Date: 1 January 2026</span>
+      <span class="dot"></span>
+      <span>Last Updated: 1 May 2026</span>
+      <span class="dot"></span>
+      <span>Version 1.0</span>
+    </div>
+
+    <div class="legal-highlight">
+      <strong>Summary:</strong> By using Nestify, you agree to these terms. Nestify is a platform connecting PG seekers with property owners across India. We are not a party to any rental agreement between users.
+    </div>
+
+    <!-- 1 -->
+    <section class="legal-section" id="acceptance">
+      <h2><span class="section-num">01</span>Acceptance of Terms</h2>
+      <p>Welcome to Nestify ("Platform", "we", "us", or "our"), operated by Nestify Technologies Private Limited. By accessing or using our website at nestify.in, our mobile applications, or any associated services (collectively, the "Services"), you ("User", "you") agree to be bound by these Terms of Service ("Terms").</p>
+      <p>If you do not agree to these Terms in their entirety, you must immediately discontinue use of our Services. Your continued use of the Platform following any updates to these Terms constitutes acceptance of those changes.</p>
+    </section>
+
+    <!-- 2 -->
+    <section class="legal-section" id="definitions">
+      <h2><span class="section-num">02</span>Definitions</h2>
+      <p>For the purposes of these Terms, the following definitions apply:</p>
+      <ul>
+        <li><strong>"Tenant"</strong> means any individual who uses the Platform to search for, shortlist, or enquire about PG accommodations.</li>
+        <li><strong>"Owner"</strong> means any individual or entity who lists PG properties on the Platform.</li>
+        <li><strong>"Listing"</strong> means any property advertisement posted by an Owner on the Platform.</li>
+        <li><strong>"Booking"</strong> means a confirmed reservation of a PG accommodation arranged through the Platform.</li>
+        <li><strong>"Content"</strong> means all text, images, photos, audio, video, and other material submitted to or displayed on the Platform.</li>
+      </ul>
+    </section>
+
+    <!-- 3 -->
+    <section class="legal-section" id="eligibility">
+      <h2><span class="section-num">03</span>Eligibility</h2>
+      <p>To use our Services, you must:</p>
+      <ul>
+        <li>Be at least 18 years of age;</li>
+        <li>Be legally capable of entering into binding contracts under the Indian Contract Act, 1872;</li>
+        <li>Not be barred from receiving services under applicable laws of India or other jurisdictions;</li>
+        <li>Provide accurate, current, and complete information during registration.</li>
+      </ul>
+      <p>By creating an account, you represent and warrant that you meet all of the above eligibility requirements.</p>
+    </section>
+
+    <!-- 4 -->
+    <section class="legal-section" id="accounts">
+      <h2><span class="section-num">04</span>User Accounts</h2>
+      <h3>Registration</h3>
+      <p>To access certain features of the Platform, you must register for an account. You agree to provide truthful information and to keep your account details current at all times.</p>
+      <h3>Account Security</h3>
+      <p>You are solely responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account. You must immediately notify us at <a href="mailto:support@nestify.in">support@nestify.in</a> of any unauthorised access or breach of security.</p>
+      <h3>One Account Per User</h3>
+      <p>Each user may maintain only one active account. Creating multiple accounts to circumvent restrictions or policies is strictly prohibited and may result in termination of all associated accounts.</p>
+    </section>
+
+    <!-- 5 -->
+    <section class="legal-section" id="listings">
+      <h2><span class="section-num">05</span>Listings & Content</h2>
+      <h3>Owner Responsibilities</h3>
+      <p>Owners are solely responsible for the accuracy, legality, and completeness of their Listings. By posting a Listing, the Owner warrants that:</p>
+      <ul>
+        <li>They have the legal right to rent the property;</li>
+        <li>All information, including pricing, amenities, and photos, is accurate and up-to-date;</li>
+        <li>The property complies with all applicable local laws, safety regulations, and licensing requirements.</li>
+      </ul>
+      <h3>Content Licence</h3>
+      <p>By submitting Content to the Platform, you grant Nestify a non-exclusive, royalty-free, worldwide, perpetual licence to use, reproduce, modify, display, and distribute such Content in connection with providing and promoting the Services.</p>
+      <h3>Removal of Content</h3>
+      <p>Nestify reserves the right to remove any Content that violates these Terms or that we deem, in our sole discretion, to be inappropriate, misleading, or harmful — without prior notice.</p>
+    </section>
+
+    <!-- 6 -->
+    <section class="legal-section" id="conduct">
+      <h2><span class="section-num">06</span>Prohibited Conduct</h2>
+      <p>You agree not to use the Platform to:</p>
+      <ul>
+        <li>Post false, misleading, or fraudulent Listings or information;</li>
+        <li>Harass, threaten, or intimidate other users;</li>
+        <li>Scrape, crawl, or systematically extract data from the Platform without our express written permission;</li>
+        <li>Transmit spam, unsolicited communications, or promotional material to other users;</li>
+        <li>Attempt to gain unauthorised access to any portion of the Platform or its related systems;</li>
+        <li>Use the Platform for any unlawful purpose or in violation of any applicable law or regulation;</li>
+        <li>Impersonate any person or entity, or falsely represent your affiliation with any person or entity;</li>
+        <li>Engage in any conduct that could damage, disable, or impair the Platform or interfere with any other party's use.</li>
+      </ul>
+      <div class="legal-warning">
+        Violation of these rules may result in immediate suspension or permanent termination of your account, and may expose you to civil or criminal liability.
+      </div>
+    </section>
+
+    <!-- 7 -->
+    <section class="legal-section" id="payments">
+      <h2><span class="section-num">07</span>Payments & Fees</h2>
+      <h3>Tenant Fees</h3>
+      <p>Browsing, searching, and contacting Owners is free for Tenants. Nestify does not charge Tenants any platform fee for accessing Listings or initiating contact with Owners.</p>
+      <h3>Owner Fees</h3>
+      <p>Owners may be subject to a service fee upon a confirmed Booking facilitated through the Platform. The applicable fee structure will be communicated clearly at the time of onboarding and may be updated with 30 days' notice.</p>
+      <h3>Rental Payments</h3>
+      <p>Nestify is not a party to any rental transaction between Tenants and Owners. All financial arrangements, deposits, and rent payments are made directly between the parties. Nestify accepts no liability for any financial dispute arising from such transactions.</p>
+    </section>
+
+    <!-- 8 -->
+    <section class="legal-section" id="ip">
+      <h2><span class="section-num">08</span>Intellectual Property</h2>
+      <p>All rights, title, and interest in and to the Platform, including its design, logos, trademarks, software, and proprietary content (excluding User-submitted Content), are and shall remain the exclusive property of Nestify Technologies Private Limited.</p>
+      <p>You are granted a limited, non-exclusive, non-transferable, revocable licence to access and use the Platform for its intended purpose. Nothing in these Terms transfers any intellectual property rights to you.</p>
+    </section>
+
+    <!-- 9 -->
+    <section class="legal-section" id="disclaimer">
+      <h2><span class="section-num">09</span>Disclaimers</h2>
+      <p>The Platform is provided on an "as is" and "as available" basis without warranties of any kind, either express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+      <p>Nestify does not warrant that:</p>
+      <ul>
+        <li>The Platform will be uninterrupted, error-free, or free of viruses or other harmful components;</li>
+        <li>Any Listing information provided by Owners is accurate, complete, or up-to-date;</li>
+        <li>The Platform will meet your specific requirements or expectations.</li>
+      </ul>
+      <p>Any reliance you place on information found on the Platform is strictly at your own risk.</p>
+    </section>
+
+    <!-- 10 -->
+    <section class="legal-section" id="liability">
+      <h2><span class="section-num">10</span>Limitation of Liability</h2>
+      <p>To the maximum extent permitted by applicable law, Nestify Technologies Private Limited, its directors, employees, agents, and affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages — including but not limited to loss of profits, data, goodwill, or other intangible losses — arising out of or in connection with:</p>
+      <ul>
+        <li>Your access to or use of (or inability to access or use) the Platform;</li>
+        <li>Any conduct or content of any third party on the Platform;</li>
+        <li>Any rental agreement, dispute, or transaction between a Tenant and an Owner;</li>
+        <li>Unauthorised access, use, or alteration of your transmissions or content.</li>
+      </ul>
+      <p>In no event shall our aggregate liability exceed ₹5,000 (Indian Rupees Five Thousand) or the amount you paid to us in the three months preceding the claim, whichever is greater.</p>
+    </section>
+
+    <!-- 11 -->
+    <section class="legal-section" id="termination">
+      <h2><span class="section-num">11</span>Termination</h2>
+      <p>Nestify may suspend or terminate your account and access to the Services, with or without notice and without liability, if we believe you have violated these Terms or engaged in conduct harmful to other users, third parties, or Nestify.</p>
+      <p>You may terminate your account at any time by contacting us at <a href="mailto:support@nestify.in">support@nestify.in</a>. Upon termination, your right to use the Services will immediately cease. Sections that by their nature should survive termination (including intellectual property, disclaimers, and limitation of liability) shall do so.</p>
+    </section>
+
+    <!-- 12 -->
+    <section class="legal-section" id="governing">
+      <h2><span class="section-num">12</span>Governing Law</h2>
+      <p>These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts located in New Delhi, India.</p>
+    </section>
+
+    <!-- 13 -->
+    <section class="legal-section" id="changes">
+      <h2><span class="section-num">13</span>Changes to Terms</h2>
+      <p>We reserve the right to modify these Terms at any time. When we do, we will update the "Last Updated" date at the top of this page and, where material changes are made, notify registered users by email or prominent notice on the Platform.</p>
+      <p>Your continued use of the Platform after such modifications constitutes your acceptance of the updated Terms.</p>
+    </section>
+
+    <!-- 14 -->
+    <section class="legal-section" id="contact-terms">
+      <h2><span class="section-num">14</span>Contact Us</h2>
+      <p>If you have any questions or concerns about these Terms, please reach out to us:</p>
+      <div class="legal-contact-card">
+        <div class="legal-contact-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div>
+          <h3>Nestify Technologies Private Limited</h3>
+          <p>Email: <a href="mailto:legal@nestify.in">legal@nestify.in</a> &nbsp;·&nbsp; Support: <a href="mailto:support@nestify.in">support@nestify.in</a><br>
+          Address: 91 Springboard, Sector 44, Gurugram, Haryana – 122003, India</p>
+        </div>
+      </div>
+    </section>
+
+  </article>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  /* Mark Terms link active in nav */
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    if (a.getAttribute('href') === '/terms-of-service/') a.classList.add('active');
+  });
+
+  /* TOC scroll spy */
+  const tocLinks = document.querySelectorAll('.legal-toc a');
+  const sections = document.querySelectorAll('.legal-section');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.legal-toc a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+{% endblock %}
