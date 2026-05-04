@@ -1,10 +1,620 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
 
-</body>
-</html>
+{% block title %}Privacy Policy – Nestify{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ══════════════════════════════════════
+     HERO
+  ══════════════════════════════════════ */
+  .policy-hero {
+    position: relative;
+    padding: 96px 48px 72px;
+    text-align: center;
+    overflow: hidden;
+    background: var(--silk);
+  }
+  .policy-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--crimson-l) 1px, transparent 1px),
+      linear-gradient(90deg, var(--crimson-l) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+  }
+  .policy-hero::after {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 320px;
+    background: radial-gradient(ellipse, var(--crimson-l) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: .72rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--crimson);
+    background: var(--gold-l);
+    border: 1px solid var(--gold-dim);
+    padding: 6px 16px; border-radius: 100px;
+    margin-bottom: 24px;
+    position: relative;
+    animation: fadeUp .6s var(--ease) .1s both;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--crimson); border-radius: 50%;
+    box-shadow: 0 0 8px var(--crimson-glow);
+  }
+
+  .policy-hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 700;
+    color: var(--obsidian);
+    line-height: 1.1;
+    letter-spacing: -.03em;
+    position: relative;
+    animation: fadeUp .7s var(--ease) .2s both;
+  }
+  .policy-hero h1 em { font-style: italic; color: var(--crimson); }
+
+  .policy-hero-meta {
+    margin-top: 18px;
+    font-size: .85rem;
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center; gap: 20px;
+    flex-wrap: wrap;
+    position: relative;
+    animation: fadeUp .7s var(--ease) .3s both;
+  }
+  .policy-hero-meta span { display: flex; align-items: center; gap: 6px; }
+  .policy-hero-meta span::before {
+    content: '';
+    width: 4px; height: 4px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+  .policy-hero-meta span:first-child::before { display: none; }
+
+  /* ══════════════════════════════════════
+     LAYOUT
+  ══════════════════════════════════════ */
+  .policy-layout {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 72px 48px 96px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  /* ══════════════════════════════════════
+     SIDEBAR TOC
+  ══════════════════════════════════════ */
+  .policy-toc {
+    position: sticky;
+    top: 96px;
+    background: var(--card-light);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 28px 24px;
+    box-shadow: 0 2px 0 rgba(0,0,0,.03), 0 8px 28px rgba(0,0,0,.05);
+  }
+  .toc-title {
+    font-size: .62rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toc-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: var(--border-light);
+  }
+  .toc-list { list-style: none; }
+  .toc-list li { margin-bottom: 4px; }
+  .toc-list a {
+    display: block;
+    font-size: .82rem; font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 7px 12px;
+    border-radius: 10px;
+    border-left: 2px solid transparent;
+    transition: color .2s, background .2s, border-color .2s, padding-left .2s;
+    line-height: 1.4;
+  }
+  .toc-list a:hover {
+    color: var(--obsidian);
+    background: var(--silk-2);
+    border-left-color: var(--crimson);
+    padding-left: 16px;
+  }
+  .toc-list a.active {
+    color: var(--crimson);
+    background: var(--crimson-l);
+    border-left-color: var(--crimson);
+    font-weight: 600;
+  }
+
+  .toc-updated {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-light);
+    font-size: .75rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .toc-updated strong { color: var(--obsidian); font-weight: 600; }
+
+  /* ══════════════════════════════════════
+     POLICY CONTENT
+  ══════════════════════════════════════ */
+  .policy-content { min-width: 0; }
+
+  .policy-section {
+    margin-bottom: 56px;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .policy-section.visible { opacity: 1; transform: translateY(0); }
+
+  .section-label {
+    font-size: .65rem; font-weight: 700;
+    letter-spacing: .18em; text-transform: uppercase;
+    color: var(--gold);
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 20px; height: 1.5px;
+    background: var(--gold); flex-shrink: 0;
+  }
+
+  .policy-section h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 700;
+    color: var(--obsidian);
+    letter-spacing: -.025em;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .policy-section p {
+    font-size: .95rem;
+    color: var(--muted);
+    line-height: 1.85;
+    margin-bottom: 14px;
+    font-weight: 400;
+  }
+  .policy-section p:last-child { margin-bottom: 0; }
+
+  .policy-section ul, .policy-section ol {
+    margin: 14px 0 14px 0;
+    padding-left: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .policy-section ul li, .policy-section ol li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: .93rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .policy-section ul li::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--crimson);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+    box-shadow: 0 0 6px var(--crimson-glow);
+  }
+  .policy-section ol { counter-reset: policy-counter; }
+  .policy-section ol li { counter-increment: policy-counter; }
+  .policy-section ol li::before {
+    content: counter(policy-counter);
+    min-width: 24px; height: 24px;
+    background: var(--crimson-l);
+    border: 1px solid rgba(185,28,28,.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 700;
+    color: var(--crimson);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Info box */
+  .info-box {
+    background: var(--gold-l);
+    border: 1px solid var(--gold-dim);
+    border-left: 3px solid var(--gold);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .info-box-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .info-box p {
+    font-size: .88rem; color: var(--obsidian);
+    margin: 0; line-height: 1.7;
+  }
+
+  /* Alert box */
+  .alert-box {
+    background: var(--crimson-l);
+    border: 1px solid rgba(185,28,28,.2);
+    border-left: 3px solid var(--crimson);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .alert-box-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+  .alert-box p {
+    font-size: .88rem; color: var(--obsidian);
+    margin: 0; line-height: 1.7;
+  }
+
+  /* Contact card */
+  .contact-card {
+    background: var(--obsidian);
+    border-radius: 20px;
+    padding: 36px 40px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 24px;
+  }
+  .contact-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold));
+  }
+  .contact-card::after {
+    content: '';
+    position: absolute; bottom: -40px; right: -40px;
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, var(--crimson-l) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .contact-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 700;
+    color: #fff; margin-bottom: 10px;
+    position: relative;
+  }
+  .contact-card p {
+    color: rgba(255,255,255,.5);
+    font-size: .88rem; line-height: 1.75;
+    margin-bottom: 20px; position: relative;
+  }
+  .contact-card a {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--crimson); color: #fff;
+    text-decoration: none;
+    padding: 11px 24px; border-radius: 100px;
+    font-size: .83rem; font-weight: 700;
+    box-shadow: 0 4px 16px var(--crimson-glow);
+    transition: background .2s, transform .15s;
+    position: relative;
+  }
+  .contact-card a:hover { background: var(--crimson-d); transform: translateY(-1px); }
+
+  /* ══════════════════════════════════════
+     DIVIDER
+  ══════════════════════════════════════ */
+  .policy-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+    margin: 8px 0 56px;
+  }
+
+  /* ══════════════════════════════════════
+     ANIMATIONS
+  ══════════════════════════════════════ */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ══════════════════════════════════════
+     RESPONSIVE
+  ══════════════════════════════════════ */
+  @media (max-width: 900px) {
+    .policy-layout {
+      grid-template-columns: 1fr;
+      gap: 40px; padding: 48px 24px 72px;
+    }
+    .policy-toc { position: static; }
+    .policy-hero { padding: 72px 24px 56px; }
+  }
+  @media (max-width: 600px) {
+    .policy-hero h1 { font-size: 2.2rem; }
+    .contact-card { padding: 28px 24px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="policy-hero">
+  <div class="hero-eyebrow">Legal</div>
+  <h1>Privacy <em>Policy</em></h1>
+  <div class="policy-hero-meta">
+    <span>Effective: 1 January 2026</span>
+    <span>Last Updated: 1 January 2026</span>
+    <span>Version 1.0</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     LAYOUT
+══════════════════════════════════════ -->
+<div class="policy-layout">
+
+  <!-- Sidebar TOC -->
+  <aside class="policy-toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#information-we-collect" class="toc-link">1. Information We Collect</a></li>
+      <li><a href="#how-we-use" class="toc-link">2. How We Use Your Information</a></li>
+      <li><a href="#sharing" class="toc-link">3. Sharing Your Information</a></li>
+      <li><a href="#cookies" class="toc-link">4. Cookies & Tracking</a></li>
+      <li><a href="#data-security" class="toc-link">5. Data Security</a></li>
+      <li><a href="#your-rights" class="toc-link">6. Your Rights</a></li>
+      <li><a href="#data-retention" class="toc-link">7. Data Retention</a></li>
+      <li><a href="#third-party" class="toc-link">8. Third-Party Links</a></li>
+      <li><a href="#children" class="toc-link">9. Children's Privacy</a></li>
+      <li><a href="#changes" class="toc-link">10. Changes to This Policy</a></li>
+      <li><a href="#contact" class="toc-link">11. Contact Us</a></li>
+    </ul>
+    <div class="toc-updated">
+      <strong>Jurisdiction:</strong><br>
+      This policy is governed by the laws of India and complies with the Information Technology Act, 2000 and applicable rules.
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="policy-content">
+
+    <div class="info-box">
+      <span class="info-box-icon">💡</span>
+      <p>We believe in plain language. This policy explains exactly what data Nestify collects, why we collect it, and how you can control it. If anything is unclear, reach out — we're happy to explain.</p>
+    </div>
+
+    <!-- 1 -->
+    <section class="policy-section" id="information-we-collect">
+      <div class="section-label">Section 01</div>
+      <h2>Information We Collect</h2>
+      <p>We collect information you provide directly, information generated automatically when you use Nestify, and in some cases, information from third parties.</p>
+
+      <p><strong style="color:var(--obsidian);">Information you provide:</strong></p>
+      <ul>
+        <li>Account registration details — name, email address, phone number, and password.</li>
+        <li>Profile information — city, role (student / working professional / PG owner), and preferences.</li>
+        <li>Listing details provided by PG owners — address, amenities, photos, pricing, and availability.</li>
+        <li>Booking enquiries and messages sent through our platform.</li>
+        <li>Feedback, reviews, and support communications.</li>
+      </ul>
+
+      <p><strong style="color:var(--obsidian);">Information collected automatically:</strong></p>
+      <ul>
+        <li>Device and browser information — IP address, browser type, operating system.</li>
+        <li>Usage data — pages visited, search queries, filters applied, time spent.</li>
+        <li>Location data — approximate city-level location, if permitted by your device.</li>
+        <li>Log data — server logs, error reports, and performance metrics.</li>
+      </ul>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 2 -->
+    <section class="policy-section" id="how-we-use">
+      <div class="section-label">Section 02</div>
+      <h2>How We Use Your Information</h2>
+      <p>We use the information we collect to operate, improve, and personalise Nestify. Specifically:</p>
+      <ol>
+        <li>To create and manage your account, and authenticate your identity securely.</li>
+        <li>To match renters with relevant PG listings based on location, budget, and preferences.</li>
+        <li>To facilitate communication between renters and PG owners through our platform.</li>
+        <li>To verify PG listings and maintain the quality and accuracy of our database.</li>
+        <li>To send transactional notifications — booking confirmations, enquiry updates, account alerts.</li>
+        <li>To improve our search algorithms, recommendation engine, and overall product experience.</li>
+        <li>To detect and prevent fraud, abuse, and other harmful activity.</li>
+        <li>To comply with legal obligations under applicable Indian law.</li>
+      </ol>
+
+      <div class="info-box">
+        <span class="info-box-icon">📧</span>
+        <p>We may send you occasional product updates or feature announcements. You can opt out of these at any time from your account settings or by clicking "Unsubscribe" in any email.</p>
+      </div>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 3 -->
+    <section class="policy-section" id="sharing">
+      <div class="section-label">Section 03</div>
+      <h2>Sharing Your Information</h2>
+      <p>We do not sell your personal information. We share it only in the following limited circumstances:</p>
+      <ul>
+        <li><strong style="color:var(--obsidian);">With PG owners:</strong> When you submit a booking enquiry, your name and contact details are shared with the relevant property owner to facilitate the booking.</li>
+        <li><strong style="color:var(--obsidian);">With service providers:</strong> Trusted third-party vendors who help us operate Nestify — including cloud hosting, email delivery, and analytics — under strict data processing agreements.</li>
+        <li><strong style="color:var(--obsidian);">For legal compliance:</strong> When required by law, court order, or government authority under Indian law.</li>
+        <li><strong style="color:var(--obsidian);">Business transfers:</strong> In the event of a merger, acquisition, or sale of assets, your data may be transferred as part of that transaction, with appropriate notice to you.</li>
+      </ul>
+
+      <div class="alert-box">
+        <span class="alert-box-icon">🔒</span>
+        <p>We never sell, rent, or trade your personal data to advertisers or data brokers. Nestify does not display third-party advertisements.</p>
+      </div>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 4 -->
+    <section class="policy-section" id="cookies">
+      <div class="section-label">Section 04</div>
+      <h2>Cookies & Tracking</h2>
+      <p>Nestify uses cookies and similar technologies to keep you logged in, remember your preferences, and understand how you use our platform.</p>
+      <ul>
+        <li><strong style="color:var(--obsidian);">Essential cookies:</strong> Required for the platform to function — authentication sessions, security tokens, and form state. Cannot be disabled.</li>
+        <li><strong style="color:var(--obsidian);">Preference cookies:</strong> Remember your search filters, location preferences, and display settings.</li>
+        <li><strong style="color:var(--obsidian);">Analytics cookies:</strong> Help us understand page performance and how features are used — no personally identifiable information is tracked.</li>
+      </ul>
+      <p>You can manage or disable non-essential cookies through your browser settings at any time. Note that disabling cookies may affect certain platform features.</p>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 5 -->
+    <section class="policy-section" id="data-security">
+      <div class="section-label">Section 05</div>
+      <h2>Data Security</h2>
+      <p>We take the security of your data seriously and implement industry-standard measures to protect it:</p>
+      <ul>
+        <li>All data is transmitted over HTTPS using TLS encryption.</li>
+        <li>Passwords are hashed using bcrypt — we never store them in plain text.</li>
+        <li>Access to production systems is restricted to authorised personnel only.</li>
+        <li>We conduct periodic security reviews and vulnerability assessments.</li>
+        <li>Authentication tokens are short-lived and rotated regularly.</li>
+      </ul>
+      <p>While we take every reasonable precaution, no system is completely immune to security risks. If you suspect your account has been compromised, please contact us immediately.</p>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 6 -->
+    <section class="policy-section" id="your-rights">
+      <div class="section-label">Section 06</div>
+      <h2>Your Rights</h2>
+      <p>You have the following rights regarding your personal data on Nestify:</p>
+      <ul>
+        <li><strong style="color:var(--obsidian);">Access:</strong> Request a copy of the personal data we hold about you.</li>
+        <li><strong style="color:var(--obsidian);">Correction:</strong> Update or correct inaccurate information in your profile at any time.</li>
+        <li><strong style="color:var(--obsidian);">Deletion:</strong> Request deletion of your account and associated personal data, subject to our retention obligations.</li>
+        <li><strong style="color:var(--obsidian);">Portability:</strong> Request an export of your data in a machine-readable format.</li>
+        <li><strong style="color:var(--obsidian);">Objection:</strong> Object to certain types of processing, such as marketing communications.</li>
+        <li><strong style="color:var(--obsidian);">Withdrawal of consent:</strong> Where processing is based on consent, you may withdraw it at any time.</li>
+      </ul>
+      <p>To exercise any of these rights, please contact us using the details in Section 11. We will respond within 30 days.</p>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 7 -->
+    <section class="policy-section" id="data-retention">
+      <div class="section-label">Section 07</div>
+      <h2>Data Retention</h2>
+      <p>We retain your personal data for as long as your account is active or as needed to provide our services. Specifically:</p>
+      <ul>
+        <li>Account data is retained for the duration of your account and deleted within 90 days of account closure, unless required by law.</li>
+        <li>Booking and transaction records may be retained for up to 7 years for legal and accounting compliance.</li>
+        <li>Anonymised analytics data may be retained indefinitely as it cannot be linked to any individual.</li>
+        <li>Support communications are retained for up to 2 years.</li>
+      </ul>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 8 -->
+    <section class="policy-section" id="third-party">
+      <div class="section-label">Section 08</div>
+      <h2>Third-Party Links</h2>
+      <p>Nestify may contain links to external websites or services not operated by us. This Privacy Policy does not apply to those third-party services. We encourage you to review the privacy policies of any external sites you visit.</p>
+      <p>We are not responsible for the content, privacy practices, or data handling of third-party websites linked from our platform.</p>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 9 -->
+    <section class="policy-section" id="children">
+      <div class="section-label">Section 09</div>
+      <h2>Children's Privacy</h2>
+      <p>Nestify is not intended for use by individuals under the age of 18. We do not knowingly collect personal information from minors.</p>
+      <p>If you believe we have inadvertently collected information from a minor, please contact us immediately and we will take steps to delete that information promptly.</p>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 10 -->
+    <section class="policy-section" id="changes">
+      <div class="section-label">Section 10</div>
+      <h2>Changes to This Policy</h2>
+      <p>We may update this Privacy Policy from time to time to reflect changes in our practices, technology, or applicable law. When we make material changes, we will:</p>
+      <ul>
+        <li>Update the "Last Updated" date at the top of this page.</li>
+        <li>Send an email notification to registered users for significant changes.</li>
+        <li>Display a notice on the platform for a reasonable period after the update.</li>
+      </ul>
+      <p>Your continued use of Nestify after any changes constitutes acceptance of the updated policy. We encourage you to review this page periodically.</p>
+    </section>
+
+    <div class="policy-divider"></div>
+
+    <!-- 11 -->
+    <section class="policy-section" id="contact">
+      <div class="section-label">Section 11</div>
+      <h2>Contact Us</h2>
+      <p>If you have any questions, concerns, or requests regarding this Privacy Policy or the way we handle your personal data, we'd love to hear from you.</p>
+      <div class="contact-card">
+        <h3>Get in Touch</h3>
+        <p>Our team typically responds within 1–2 business days. For data-related requests, please mention "Privacy Request" in your subject line so we can prioritise accordingly.</p>
+        <a href="mailto:privacy@nestify.in">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          privacy@nestify.in
+        </a>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  /* Scroll reveal for policy sections */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.policy-section').forEach(el => observer.observe(el));
+
+  /* Active TOC highlighting */
+  const sections   = document.querySelectorAll('.policy-section');
+  const tocLinks   = document.querySelectorAll('.toc-link');
+
+  const tocObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.toc-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => tocObserver.observe(s));
+</script>
+{% endblock %}
