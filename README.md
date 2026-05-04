@@ -85,7 +85,7 @@ Nestify/
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Akshatswami610/Nestify
 cd Nestify
 ```
 
