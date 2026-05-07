@@ -24,7 +24,6 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# Azure HTTPS proxy fix
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
@@ -192,31 +191,23 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 # --------------------------------------------------
-# AZURE BLOB STORAGE
+# MEDIA FILES (AZURE BLOB STORAGE)
 # --------------------------------------------------
 
-AZURE_ACCOUNT_NAME = config('AZURE_ACCOUNT_NAME')
-AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY')
-AZURE_CONTAINER = config('AZURE_CONTAINER')
-
 MEDIA_URL = (
-    f'https://{AZURE_ACCOUNT_NAME}.blob.core.windows.net/{AZURE_CONTAINER}/'
+    f'https://{config("AZURE_ACCOUNT_NAME")}.blob.core.windows.net/media/'
 )
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.azure_storage.AzureStorage",
-        "OPTIONS": {
-            "account_name": AZURE_ACCOUNT_NAME,
-            "account_key": AZURE_ACCOUNT_KEY,
-            "azure_container": AZURE_CONTAINER,
-        },
+        "BACKEND": "core.storage_backends.AzureMediaStorage",
     },
 
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
 
 # --------------------------------------------------
 # DEFAULT PRIMARY KEY
