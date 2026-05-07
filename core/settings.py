@@ -194,22 +194,19 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # MEDIA FILES (AZURE BLOB STORAGE)
 # --------------------------------------------------
 
-DEFAULT_FILE_STORAGE = "core.storage_backends.AzureMediaStorage"
-
 MEDIA_URL = (
     f'https://{config("AZURE_ACCOUNT_NAME")}.blob.core.windows.net/media/'
 )
 
-# --------------------------------------------------
-# STATIC FILES STORAGE
-# --------------------------------------------------
-
 STORAGES = {
+    "default": {
+        "BACKEND": "core.storage_backends.AzureMediaStorage",
+    },
+
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
 
 # --------------------------------------------------
 # DEFAULT PRIMARY KEY
