@@ -9,9 +9,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------------------------------
 SECRET_KEY = config('SECRET_KEY')
 
-DEBUG = config('DEBUG', cast=bool)
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost'
+).split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     'https://nestify-fsgmbzdygxb3czcq.centralindia-01.azurewebsites.net',
@@ -21,7 +24,7 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# Required for Azure HTTPS proxy
+# Azure HTTPS proxy fix
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     # Third-party
     'rest_framework',
     'rest_framework.authtoken',
+    'storages',
 
     # Local apps
     'accounts',
@@ -54,13 +58,11 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # WhiteNoise for static files
+    # WhiteNoise
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-
-    # CSRF protection
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -111,7 +113,7 @@ DATABASES = {
         'USER': config('DB_USER'),
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', cast=int),
+        'PORT': config('DB_PORT', cast=int, default=5432),
         'OPTIONS': {
             'sslmode': 'require',
         },
@@ -192,13 +194,30 @@ STATICFILES_STORAGE = (
     'whitenoise.storage.CompressedManifestStaticFilesStorage'
 )
 
-
 # --------------------------------------------------
-# MEDIA FILES
+# AZURE BLOB STORAGE
 # --------------------------------------------------
-MEDIA_URL = '/media/'
 
-MEDIA_ROOT = BASE_DIR / 'media'
+AZURE_ACCOUNT_NAME = config('AZURE_ACCOUNT_NAME')
+AZURE_ACCOUNT_KEY = config('AZURE_ACCOUNT_KEY')
+AZURE_CONTAINER = 'media'
+
+AZURE_CUSTOM_DOMAIN = (
+    f'{AZURE_ACCOUNT_NAME}.blob.core.windows.net'
+)
+
+MEDIA_URL = (
+    f'https://{AZURE_CUSTOM_DOMAIN}/{AZURE_CONTAINER}/'
+)
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 # --------------------------------------------------
